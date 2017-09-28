@@ -10,6 +10,8 @@
 
     <filter>
         <whitelist addUncoveredFilesFromWhiteList="true">
+            <directory suffix=".php">Console</directory>
+            <directory suffix=".php">Job</directory>
             <directory suffix=".php">Model</directory>
         </whitelist>
     </filter>
