@@ -17,7 +17,7 @@ use Dopamedia\PhpBatch\Item\ExecutionContext;
 use Dopamedia\PhpBatch\Job\RuntimeErrorException;
 use Dopamedia\PhpBatch\JobExecutionInterface;
 use Dopamedia\PhpBatch\JobInstanceInterface;
-use Dopamedia\PhpBatch\JobParameters;
+use Dopamedia\PhpBatch\Job\JobParameters;
 use Dopamedia\PhpBatch\StepExecutionInterface;
 use Magento\Framework\DataObject;
 use Magento\Framework\Exception\NoSuchEntityException;

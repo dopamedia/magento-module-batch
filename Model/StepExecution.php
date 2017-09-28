@@ -13,7 +13,7 @@ use Dopamedia\PhpBatch\ExitStatus;
 use Dopamedia\PhpBatch\Item\ExecutionContext;
 use Dopamedia\PhpBatch\Job\RuntimeErrorException;
 use Dopamedia\PhpBatch\JobExecutionInterface;
-use Dopamedia\PhpBatch\JobParameters;
+use Dopamedia\PhpBatch\Job\JobParameters;
 use Dopamedia\PhpBatch\StepExecutionInterface;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Model\AbstractModel;
