@@ -12,7 +12,7 @@ use Dopamedia\PhpBatch\BatchStatus;
 use Dopamedia\PhpBatch\ExitStatus;
 use Dopamedia\PhpBatch\Job\RuntimeErrorException;
 use Dopamedia\PhpBatch\JobExecutionInterface;
-use Dopamedia\PhpBatch\JobParameters;
+use Dopamedia\PhpBatch\Job\JobParameters;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Phrase;
 use Magento\Framework\Serialize\Serializer\Json as Serializer;
