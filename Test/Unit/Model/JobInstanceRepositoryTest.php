@@ -81,4 +81,34 @@ class JobInstanceRepositoryTest extends TestCase
         $this->assertSame($this->jobInstanceMock, $this->jobInstanceRepository->getById(123));
     }
 
+    public function testGetByCodeThrowsNoSuchEntityException()
+    {
+        $this->jobInstanceFactoryMock->expects($this->once())
+            ->method('create')
+            ->willReturn($this->jobInstanceMock);
+
+        $this->jobInstanceMock->expects($this->once())
+            ->method('getId')
+            ->willReturn(null);
+
+        $this->expectException(NoSuchEntityException::class);
+        $this->expectExceptionMessage('JobInstance with code "code" does not exist.');
+
+        $this->jobInstanceRepository->getByCode('code');
+    }
+
+    public function testGetByCode()
+    {
+        $this->jobInstanceFactoryMock->expects($this->once())
+            ->method('create')
+            ->willReturn($this->jobInstanceMock);
+
+        $this->jobInstanceMock->expects($this->once())
+            ->method('getId')
+            ->willReturn(123);
+
+        $this->assertSame($this->jobInstanceMock, $this->jobInstanceRepository->getByCode('code'));
+    }
+
+
 }

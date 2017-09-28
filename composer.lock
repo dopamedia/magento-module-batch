@@ -378,12 +378,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/dopamedia/php-batch.git",
-                "reference": "3d4b237963bc3e03c10748f40dc350bf61bc385a"
+                "reference": "c2b5228829366c1c04dd32585b68cfbef673029d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/dopamedia/php-batch/zipball/3d4b237963bc3e03c10748f40dc350bf61bc385a",
-                "reference": "3d4b237963bc3e03c10748f40dc350bf61bc385a",
+                "url": "https://api.github.com/repos/dopamedia/php-batch/zipball/c2b5228829366c1c04dd32585b68cfbef673029d",
+                "reference": "c2b5228829366c1c04dd32585b68cfbef673029d",
                 "shasum": ""
             },
             "require": {
@@ -410,7 +410,7 @@
                 }
             ],
             "description": "N/A",
-            "time": "2017-09-28 15:19:34"
+            "time": "2017-09-28 15:40:02"
         },
         {
             "name": "justinrainbow/json-schema",

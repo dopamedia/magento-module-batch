@@ -21,4 +21,11 @@ interface JobInstanceRepositoryInterface
      * @throws NoSuchEntityException
      */
     public function getById(int $jobInstanceId): JobInstanceInterface;
+
+    /**
+     * @param string $jobInstanceCode
+     * @return JobInstanceInterface
+     * @throws NoSuchEntityException
+     */
+    public function getByCode(string $jobInstanceCode): JobInstanceInterface;
 }

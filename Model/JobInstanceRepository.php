@@ -61,4 +61,22 @@ class JobInstanceRepository implements JobInstanceRepositoryInterface
         return $jobInstance;
     }
 
+    /**
+     * @param string $jobInstanceCode
+     * @return JobInstanceInterface
+     * @throws NoSuchEntityException
+     */
+    public function getByCode(string $jobInstanceCode): JobInstanceInterface
+    {
+        /** @var JobInstance $jobInstance */
+        $jobInstance = $this->jobInstanceFactory->create();
+        $this->resource->load($jobInstance, $jobInstanceCode, JobInstance::CODE);
+        if ($jobInstance->getId() === null) {
+            throw new NoSuchEntityException(
+                new Phrase('JobInstance with code "%1" does not exist.', [$jobInstanceCode])
+            );
+        }
+
+        return $jobInstance;
+    }
 }

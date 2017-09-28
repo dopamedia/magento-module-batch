@@ -38,7 +38,7 @@ class JobRegistryTest extends TestCase
     {
         /** @var \PHPUnit_Framework_MockObject_MockObject|JobInterface $firstJobMock */
         $firstJobMock = $this->createMock(JobInterface::class);
-        
+
         /** @var \PHPUnit_Framework_MockObject_MockObject|JobInterface $secondJobMock */
         $secondJobMock = $this->createMock(JobInterface::class);
 
