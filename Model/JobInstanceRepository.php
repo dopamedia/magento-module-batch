@@ -10,7 +10,10 @@ use Dopamedia\Batch\Api\JobInstanceRepositoryInterface;
 use Dopamedia\PhpBatch\JobInstanceInterface;
 use Dopamedia\Batch\Model\ResourceModel\JobInstance as ResourceJobInstance;
 use Dopamedia\Batch\Model\JobInstanceFactory;
+use Magento\Framework\DataObject;
+use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\Model\AbstractModel;
 use Magento\Framework\Phrase;
 
 /**
@@ -79,4 +82,22 @@ class JobInstanceRepository implements JobInstanceRepositoryInterface
 
         return $jobInstance;
     }
+
+    /**
+     * @param JobInstanceInterface|AbstractModel $jobInstance
+     * @return JobInstanceInterface
+     * @throws CouldNotSaveException
+     */
+    public function save(JobInstanceInterface $jobInstance): JobInstanceInterface
+    {
+        try {
+            $this->resource->save($jobInstance);
+        } catch (\Exception $e) {
+            throw new CouldNotSaveException(__($e->getMessage()));
+        }
+
+        return $jobInstance;
+    }
+
+
 }
