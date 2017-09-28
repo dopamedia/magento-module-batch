@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="Dopamedia\PhpBatch\JobExecutionInterface" type="Dopamedia\Batch\Model\JobExecution" />
+    <preference for="Dopamedia\Batch\Api\JobExecutionRepositoryInterface" type="Dopamedia\Batch\Model\JobExecutionRepository" />
+    <preference for="Dopamedia\PhpBatch\JobInstanceInterface" type="Dopamedia\Batch\Model\JobInstance" />
+    <preference for="Dopamedia\Batch\Api\JobInstanceRepositoryInterface" type="Dopamedia\Batch\Model\JobInstanceRepository" />
+    <preference for="Dopamedia\PhpBatch\StepExecutionInterface" type="Dopamedia\Batch\Model\StepExecution" />
+    <preference for="Dopamedia\Batch\Api\StepExecutionRepositoryInterface" type="Dopamedia\Batch\Model\StepExecutionRepository" />
+    <preference for="Dopamedia\PhpBatch\WarningInterface" type="Dopamedia\Batch\Model\Warning" />
+    <preference for="Dopamedia\Batch\Api\WarningRepositoryInterface" type="Dopamedia\Batch\Model\WarningRepository" />
+    <preferecen for="Dopamedia\PhpBatch\Job\JobRegistryInterface" type="Dopamedia\Batch\Job\JobRegistry" />
+</config>
