@@ -350,9 +350,9 @@ class StepExecution extends AbstractModel implements StepExecutionInterface
      * @inheritDoc
      * @codeCoverageIgnore
      */
-    public function isTerminateOnly(): int
+    public function isTerminateOnly(): bool
     {
-        return $this->getData(self::TERMINATE_ONLY);
+        return $this->getData(self::TERMINATE_ONLY) ?? false;
     }
 
     /**
@@ -361,7 +361,7 @@ class StepExecution extends AbstractModel implements StepExecutionInterface
      */
     public function setTerminateOnly(): StepExecutionInterface
     {
-        return $this->setData(self::TERMINATE_ONLY);
+        return $this->setData(self::TERMINATE_ONLY, true);
     }
 
     /**
