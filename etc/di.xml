@@ -11,6 +11,9 @@
     <preference for="Dopamedia\PhpBatch\Repository\JobRepositoryInterface" type="Dopamedia\Batch\Model\JobRepository" />
     <preference for="Dopamedia\PhpBatch\Job\JobRegistryInterface" type="Dopamedia\Batch\Model\JobRegistry" />
     <preference for="Dopamedia\PhpBatch\Adapter\EventManagerAdapterInterface" type="Dopamedia\Batch\Adapter\EventManagerAdapter" />
+    <preference for="Dopamedia\PhpBatch\Item\ItemReaderInterface" type="Dopamedia\Batch\Reader\NoopReader" />
+    <preference for="Dopamedia\PhpBatch\Item\ItemProcessorInterface" type="Dopamedia\Batch\Processor\NoopProcessor" />
+    <preference for="Dopamedia\PhpBatch\Item\ItemWriterInterface" type="Dopamedia\Batch\Writer\NoopWriter" />
 
     <type name="Magento\Framework\Console\CommandListInterface">
         <arguments>
