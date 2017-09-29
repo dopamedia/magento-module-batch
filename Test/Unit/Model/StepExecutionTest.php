@@ -248,5 +248,47 @@ class StepExecutionTest extends TestCase
         $this->assertcount(3, $stepExecution->getFailureExceptions());
     }
 
+    public function testBeforeSaveStatus()
+    {
+        $stepExecution = $this->getStepExecutionObject();
+        $stepExecution->setData('status', BatchStatus::STARTED());
+
+        $stepExecution->beforeSave();
+
+        $this->assertEquals(
+            BatchStatus::STARTED,
+            $stepExecution->getData('status')
+        );
+    }
+
+    public function testBeforeSaveFailureExceptionsWithoutValues()
+    {
+        $stepExecution = $this->getStepExecutionObject();
+        $stepExecution->setData('failure_exceptions', null);
+
+        $this->serializerMock->expects($this->never())
+            ->method('serialize');
+
+        $stepExecution->beforeSave();
+    }
+
+    public function testBeforeSaveFailureExceptions()
+    {
+        $stepExecution = $this->getStepExecutionObject();
+        $stepExecution->setData('failure_exceptions', [['key' => 'value']]);
+
+        $this->serializerMock->expects($this->once())
+            ->method('serialize')
+            ->with([['key' => 'value']])
+            ->willReturn('[{"key":"value"}]');
+
+        $stepExecution->beforeSave();
+
+        $this->assertEquals(
+            '[{"key":"value"}]',
+            $stepExecution->getData('failure_exceptions')
+        );
+    }
+
 
 }

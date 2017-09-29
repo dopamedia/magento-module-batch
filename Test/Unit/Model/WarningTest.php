@@ -174,9 +174,15 @@ class WarningTest extends TestCase
 
         $this->serializerMock->expects($this->once())
             ->method('serialize')
-            ->with([['key' => 'value']]);
+            ->with([['key' => 'value']])
+            ->willReturn('[{"key":"value"}]');
 
         $warning->beforeSave();
+
+        $this->assertEquals(
+            '[{"key":"value"}]',
+            $warning->getData('reason_parameters')
+        );
     }
 
     public function testBeforeSaveItemWithoutValues()
@@ -197,8 +203,14 @@ class WarningTest extends TestCase
 
         $this->serializerMock->expects($this->once())
             ->method('serialize')
-            ->with([['key' => 'value']]);
+            ->with([['key' => 'value']])
+            ->willReturn('[{"key":"value"}]');
 
         $warning->beforeSave();
+
+        $this->assertEquals(
+            '[{"key":"value"}]',
+            $warning->getData('item')
+        );
     }
 }

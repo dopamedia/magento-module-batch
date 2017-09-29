@@ -192,7 +192,7 @@ class JobRepositoryTest extends TestCase
             ->method('save')
             ->with($this->warningMock)
             ->willReturn($this->warningMock);
-        
+
         $this->assertSame(
             $this->warningMock,
             $this->jobRepository->createWarning(

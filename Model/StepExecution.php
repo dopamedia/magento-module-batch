@@ -404,4 +404,26 @@ class StepExecution extends AbstractModel implements StepExecutionInterface
 
         return $this->setData(self::FAILURE_EXCEPTIONS, $failureExceptions);
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function beforeSave()
+    {
+        $status = $this->getData(self::STATUS);
+
+        if ($status instanceof BatchStatus) {
+            $this->setData(self::STATUS, $status->getValue());
+        }
+
+        $failureExceptions = $this->getData(self::FAILURE_EXCEPTIONS);
+
+        if (is_array($failureExceptions)) {
+            $this->setData(self::FAILURE_EXCEPTIONS, $this->serializer->serialize($failureExceptions));
+        }
+
+        return parent::beforeSave();
+    }
+
+
 }

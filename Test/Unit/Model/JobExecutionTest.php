@@ -363,4 +363,47 @@ class JobExecutionTest extends TestCase
 
         $this->assertTrue($jobExecution->isStopping());
     }
+
+    public function testBeforeSaveStatus()
+    {
+        $jobExecution = $this->getJobExecutionObject();
+        $jobExecution->setData('status', BatchStatus::STARTED());
+
+        $jobExecution->beforeSave();
+
+        $this->assertEquals(
+            BatchStatus::STARTED,
+            $jobExecution->getData('status')
+        );
+    }
+
+    public function testBeforeSaveFailureExceptionsWithoutValues()
+    {
+        $jobExecution = $this->getJobExecutionObject();
+        $jobExecution->setData('failure_exceptions', null);
+
+        $this->serializerMock->expects($this->never())
+            ->method('serialize');
+
+        $jobExecution->beforeSave();
+    }
+
+    public function testBeforeSaveFailureExceptions()
+    {
+        $jobExecution = $this->getJobExecutionObject();
+        $jobExecution->setData('failure_exceptions', [['key' => 'value']]);
+
+        $this->serializerMock->expects($this->once())
+            ->method('serialize')
+            ->with([['key' => 'value']])
+            ->willReturn('[{"key":"value"}]');
+
+        $jobExecution->beforeSave();
+
+        $this->assertEquals(
+            '[{"key":"value"}]',
+            $jobExecution->getData('failure_exceptions')
+        );
+    }
+
 }

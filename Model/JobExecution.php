@@ -458,4 +458,23 @@ class JobExecution extends AbstractModel implements JobExecutionInterface
         return $this->getStatus()->getValue() === BatchStatus::STOPPING;
     }
 
+    /**
+     * @inheritdoc
+     */
+    public function beforeSave()
+    {
+        $status = $this->getData(self::STATUS);
+
+        if ($status instanceof BatchStatus) {
+            $this->setData(self::STATUS, $status->getValue());
+        }
+
+        $failureExceptions = $this->getData(self::FAILURE_EXCEPTIONS);
+
+        if (is_array($failureExceptions)) {
+            $this->setData(self::FAILURE_EXCEPTIONS, $this->serializer->serialize($failureExceptions));
+        }
+
+        return parent::beforeSave();
+    }
 }
