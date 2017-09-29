@@ -11,7 +11,6 @@ use Dopamedia\Batch\Model\ResourceModel\JobExecution as ResourceJobExecution;
 use Dopamedia\Batch\Model\ResourceModel\StepExecution\Collection as StepExecutionCollection;
 use Dopamedia\Batch\Model\ResourceModel\StepExecution\CollectionFactory as StepExecutionCollectionFactory;
 use Dopamedia\PhpBatch\BatchStatus;
-use Dopamedia\PhpBatch\EntityInterface;
 use Dopamedia\PhpBatch\ExitStatus;
 use Dopamedia\PhpBatch\Item\ExecutionContext;
 use Dopamedia\PhpBatch\Job\RuntimeErrorException;
@@ -29,12 +28,10 @@ class JobExecution extends AbstractModel implements JobExecutionInterface
     /**#@+*/
     public const ID = 'id';
     public const PID = 'pid';
-    public const USER = 'user';
     public const STATUS = 'status';
     public const START_TIME = 'start_time';
     public const END_TIME = 'end_time';
     public const CREATE_TIME = 'create_time';
-    public const UPDATE_TIME = 'update_time';
     public const EXIT_CODE = 'exit_code';
     public const EXIT_DESCRIPTION = 'exit_description';
     public const FAILURE_EXCEPTIONS = 'failure_exceptions';
@@ -189,6 +186,24 @@ class JobExecution extends AbstractModel implements JobExecutionInterface
         $this->setJobInstanceId($jobInstance->getId());
 
         return $this;
+    }
+
+    /**
+     * @inheritDoc
+     * @codeCoverageIgnore
+     */
+    public function getPid(): ?int
+    {
+        return $this->getData(self::PID);
+    }
+
+    /**
+     * @inheritDoc
+     * @codeCoverageIgnore
+     */
+    public function setPid(int $pid): JobExecutionInterface
+    {
+        return $this->setData(self::PID, $pid);
     }
 
     /**

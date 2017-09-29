@@ -70,11 +70,6 @@ class InstallSchema implements InstallSchemaInterface
             null,
             ['nullable' => true]
         )->addColumn(
-            'user',
-            \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
-            255,
-            ['nullable' => true]
-        )->addColumn(
             'status',
             \Magento\Framework\DB\Ddl\Table::TYPE_INTEGER,
             null
@@ -90,11 +85,6 @@ class InstallSchema implements InstallSchemaInterface
             ['nullable' => true]
         )->addColumn(
             'create_time',
-            \Magento\Framework\DB\Ddl\Table::TYPE_TIMESTAMP,
-            null,
-            ['nullable' => true]
-        )->addColumn(
-            'updated_time',
             \Magento\Framework\DB\Ddl\Table::TYPE_TIMESTAMP,
             null,
             ['nullable' => true]
