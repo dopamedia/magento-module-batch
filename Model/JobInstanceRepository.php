@@ -98,6 +98,4 @@ class JobInstanceRepository implements JobInstanceRepositoryInterface
 
         return $jobInstance;
     }
-
-
 }

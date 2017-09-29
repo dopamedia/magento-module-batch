@@ -9,7 +9,9 @@ namespace Dopamedia\Batch\Model;
 use Dopamedia\Batch\Api\JobExecutionRepositoryInterface;
 use Dopamedia\Batch\Model\ResourceModel\JobExecution as ResourceJobExecution;
 use Dopamedia\PhpBatch\JobExecutionInterface;
+use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\Model\AbstractModel;
 use Magento\Framework\Phrase;
 
 /**
@@ -55,6 +57,22 @@ class JobExecutionRepository implements JobExecutionRepositoryInterface
             throw new NoSuchEntityException(
                 new Phrase('JobExecution with id "%1" does not exist.', [$jobExecutionId])
             );
+        }
+
+        return $jobExecution;
+    }
+
+    /**
+     * @param JobExecutionInterface|AbstractModel $jobExecution
+     * @return JobExecutionInterface
+     * @throws CouldNotSaveException
+     */
+    public function save(JobExecutionInterface $jobExecution): JobExecutionInterface
+    {
+        try {
+            $this->resource->save($jobExecution);
+        } catch (\Exception $e) {
+            throw new CouldNotSaveException(__($e->getMessage()));
         }
 
         return $jobExecution;

@@ -7,6 +7,7 @@
 namespace Dopamedia\Batch\Api;
 
 use Dopamedia\PhpBatch\JobExecutionInterface;
+use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Framework\Exception\NoSuchEntityException;
 
 /**
@@ -21,4 +22,12 @@ interface JobExecutionRepositoryInterface
      * @throws NoSuchEntityException
      */
     public function getById(int $jobExecutionId): JobExecutionInterface;
+
+    /**
+     * @param JobExecutionInterface $jobExecution
+     * @return JobExecutionInterface
+     * @throws CouldNotSaveException
+     */
+    public function save(JobExecutionInterface $jobExecution): JobExecutionInterface;
+
 }

@@ -10,8 +10,10 @@ use Dopamedia\Batch\Api\WarningRepositoryInterface;
 use Dopamedia\Batch\Model\ResourceModel\Warning as ResourceWarning;
 use Dopamedia\Batch\Model\WarningFactory;
 use Dopamedia\PhpBatch\WarningInterface;
+use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Phrase;
+use Magento\Rule\Model\AbstractModel;
 
 /**
  * Class WarningRepository
@@ -60,5 +62,21 @@ class WarningRepository implements WarningRepositoryInterface
         }
 
         return $waring;
+    }
+
+    /**
+     * @param WarningInterface|AbstractModel $warning
+     * @return WarningInterface
+     * @throws CouldNotSaveException
+     */
+    public function save(WarningInterface $warning): WarningInterface
+    {
+        try {
+            $this->resource->save($warning);
+        } catch (\Exception $e) {
+            throw new CouldNotSaveException(__($e->getMessage()));
+        }
+
+        return $warning;
     }
 }

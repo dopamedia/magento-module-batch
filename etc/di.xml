@@ -8,6 +8,7 @@
     <preference for="Dopamedia\Batch\Api\StepExecutionRepositoryInterface" type="Dopamedia\Batch\Model\StepExecutionRepository" />
     <preference for="Dopamedia\PhpBatch\WarningInterface" type="Dopamedia\Batch\Model\Warning" />
     <preference for="Dopamedia\Batch\Api\WarningRepositoryInterface" type="Dopamedia\Batch\Model\WarningRepository" />
+    <preference for="Dopamedia\PhpBatch\Repository\JobRepositoryInterface" type="Dopamedia\Batch\Model\JobRepository" />
     <preference for="Dopamedia\PhpBatch\Job\JobRegistryInterface" type="Dopamedia\Batch\Model\JobRegistry" />
 
     <type name="Magento\Framework\Console\CommandListInterface">

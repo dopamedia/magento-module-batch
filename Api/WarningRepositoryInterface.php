@@ -7,6 +7,7 @@
 namespace Dopamedia\Batch\Api;
 
 use Dopamedia\PhpBatch\WarningInterface;
+use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Framework\Exception\NoSuchEntityException;
 
 /**
@@ -21,4 +22,12 @@ interface WarningRepositoryInterface
      * @throws NoSuchEntityException
      */
     public function getById(int $warningId): WarningInterface;
+
+    /**
+     * @param WarningInterface $warning
+     * @return WarningInterface
+     * @throws CouldNotSaveException
+     */
+    public function save(WarningInterface $warning): WarningInterface;
+
 }

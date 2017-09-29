@@ -7,6 +7,7 @@
 namespace Dopamedia\Batch\Api;
 
 use Dopamedia\PhpBatch\StepExecutionInterface;
+use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Framework\Exception\NoSuchEntityException;
 
 /**
@@ -21,5 +22,12 @@ interface StepExecutionRepositoryInterface
      * @throws NoSuchEntityException
      */
     public function getById(int $stepExecutionId): StepExecutionInterface;
+
+    /**
+     * @param StepExecutionInterface $stepExecution
+     * @return StepExecutionInterface
+     * @throws CouldNotSaveException
+     */
+    public function save(StepExecutionInterface $stepExecution): StepExecutionInterface;
 
 }

@@ -9,7 +9,6 @@ namespace Dopamedia\Batch\Test\Unit\Model;
 use Dopamedia\Batch\Api\StepExecutionRepositoryInterface;
 use Dopamedia\Batch\Model\Warning;
 use Dopamedia\PhpBatch\StepExecutionInterface;
-use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Phrase;
 use Magento\Framework\Serialize\Serializer\Json as Serializer;

@@ -10,6 +10,7 @@ use Dopamedia\Batch\Model\Warning;
 use Dopamedia\Batch\Model\WarningRepository;
 use Dopamedia\Batch\Model\ResourceModel\Warning as ResourceWarning;
 use Dopamedia\Batch\Model\WarningFactory;
+use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use PHPUnit\Framework\TestCase;
 
@@ -79,6 +80,32 @@ class WarningRepositoryTest extends TestCase
             ->willReturn(123);
 
         $this->assertSame($this->warningMock, $this->warningRepository->getById(123));
+    }
+
+    public function testSaveThrowsCouldNotSaveException()
+    {
+        $this->resourceMock->expects($this->once())
+            ->method('save')
+            ->with($this->warningMock)
+            ->willThrowException(new \Exception('exception message'));
+
+        $this->expectException(CouldNotSaveException::class);
+        $this->expectExceptionMessage('exception message');
+
+        $this->warningRepository->save($this->warningMock);
+    }
+
+    public function testSave()
+    {
+        $this->resourceMock->expects($this->once())
+            ->method('save')
+            ->with($this->warningMock)
+            ->willReturn($this->warningMock);
+
+        $this->assertSame(
+            $this->warningMock,
+            $this->warningRepository->save($this->warningMock)
+        );
     }
 
 }

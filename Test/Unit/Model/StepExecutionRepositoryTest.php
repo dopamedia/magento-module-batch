@@ -10,6 +10,7 @@ use Dopamedia\Batch\Model\StepExecution;
 use Dopamedia\Batch\Model\StepExecutionRepository;
 use Dopamedia\Batch\Model\ResourceModel\StepExecution as ResourceStepExecution;
 use Dopamedia\Batch\Model\StepExecutionFactory;
+use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use PHPUnit\Framework\TestCase;
 
@@ -82,6 +83,29 @@ class StepExecutionRepositoryTest extends TestCase
         $this->assertSame($this->stepExecutionMock, $this->stepExecutionRepository->getById(123));
     }
 
+    public function testSaveThrowsCouldNotSaveException()
+    {
+        $this->resourceMock->expects($this->once())
+            ->method('save')
+            ->with($this->stepExecutionMock)
+            ->willThrowException(new \Exception('exception message'));
 
+        $this->expectException(CouldNotSaveException::class);
+        $this->expectExceptionMessage('exception message');
 
+        $this->stepExecutionRepository->save($this->stepExecutionMock);
+    }
+
+    public function testSave()
+    {
+        $this->resourceMock->expects($this->once())
+            ->method('save')
+            ->with($this->stepExecutionMock)
+            ->willReturn($this->stepExecutionMock);
+
+        $this->assertSame(
+            $this->stepExecutionMock,
+            $this->stepExecutionRepository->save($this->stepExecutionMock)
+        );
+    }
 }

@@ -10,6 +10,7 @@ use Dopamedia\Batch\Model\JobExecution;
 use Dopamedia\Batch\Model\JobExecutionFactory;
 use Dopamedia\Batch\Model\JobExecutionRepository;
 use Dopamedia\Batch\Model\ResourceModel\JobExecution as ResourceJobExecution;
+use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use PHPUnit\Framework\TestCase;
 
@@ -80,4 +81,32 @@ class JobExecutionRepositoryTest extends TestCase
 
         $this->assertSame($this->jobExecutionMock, $this->jobExecutionRepository->getById(123));
     }
+
+    public function testSaveThrowsCouldNotSaveException()
+    {
+        $this->resourceMock->expects($this->once())
+            ->method('save')
+            ->with($this->jobExecutionMock)
+            ->willThrowException(new \Exception('exception message'));
+
+        $this->expectException(CouldNotSaveException::class);
+        $this->expectExceptionMessage('exception message');
+
+        $this->jobExecutionRepository->save($this->jobExecutionMock);
+    }
+
+    public function testSave()
+    {
+        $this->resourceMock->expects($this->once())
+            ->method('save')
+            ->with($this->jobExecutionMock)
+            ->willReturn($this->jobExecutionMock);
+
+        $this->assertSame(
+            $this->jobExecutionMock,
+            $this->jobExecutionRepository->save($this->jobExecutionMock)
+        );
+    }
+
+
 }

@@ -10,7 +10,9 @@ use Dopamedia\Batch\Api\StepExecutionRepositoryInterface;
 use Dopamedia\PhpBatch\StepExecutionInterface;
 use Dopamedia\Batch\Model\ResourceModel\StepExecution as ResourceStepExecution;
 use Dopamedia\Batch\Model\StepExecutionFactory;
+use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\Model\AbstractModel;
 use Magento\Framework\Phrase;
 
 /**
@@ -57,6 +59,22 @@ class StepExecutionRepository implements StepExecutionRepositoryInterface
             throw new NoSuchEntityException(
                 new Phrase('StepExecution with id "%1" does not exist.', [$stepExecutionId])
             );
+        }
+
+        return $stepExecution;
+    }
+
+    /**
+     * @param StepExecutionInterface|AbstractModel $stepExecution
+     * @return StepExecutionInterface
+     * @throws CouldNotSaveException
+     */
+    public function save(StepExecutionInterface $stepExecution): StepExecutionInterface
+    {
+        try {
+            $this->resource->save($stepExecution);
+        } catch (\Exception $e) {
+            throw new CouldNotSaveException(__($e->getMessage()));
         }
 
         return $stepExecution;
