@@ -8,17 +8,26 @@ namespace Dopamedia\Batch\Test\Unit\Model;
 
 use Dopamedia\Batch\Api\JobExecutionRepositoryInterface;
 use Dopamedia\Batch\Model\StepExecution;
+use Dopamedia\Batch\Model\Warning;
+use Dopamedia\Batch\Model\WarningFactory;
 use Dopamedia\PhpBatch\BatchStatus;
 use Dopamedia\PhpBatch\ExitStatus;
+use Dopamedia\PhpBatch\Item\InvalidItemInterface;
 use Dopamedia\PhpBatch\Job\RuntimeErrorException;
 use Dopamedia\PhpBatch\JobExecutionInterface;
 use Dopamedia\PhpBatch\Job\JobParameters;
+use Dopamedia\PhpBatch\WarningInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Phrase;
+use Dopamedia\Batch\Model\ResourceModel\Warning\Collection as WarningCollection;
+use Dopamedia\Batch\Model\ResourceModel\Warning\CollectionFactory as WarningCollectionFactory;
 use Magento\Framework\Serialize\Serializer\Json as Serializer;
 use Magento\Framework\TestFramework\Unit\Helper\ObjectManager;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @group current
+ */
 class StepExecutionTest extends TestCase
 {
     /**
@@ -42,6 +51,26 @@ class StepExecutionTest extends TestCase
     protected $serializerMock;
 
     /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|WarningCollectionFactory
+     */
+    protected $warningCollectionFactoryMock;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|WarningCollection
+     */
+    protected $warningCollectionMock;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|WarningFactory
+     */
+    protected $warningFactoryMock;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|Warning
+     */
+    protected $warningMock;
+
+    /**
      * @var ObjectManager
      */
     protected $objectManager;
@@ -53,6 +82,16 @@ class StepExecutionTest extends TestCase
         $this->jobExecutionMock = $this->createMock(JobExecutionInterface::class);
         $this->jobParametersMock = $this->createMock(JobParameters::class);
         $this->serializerMock = $this->createMock(Serializer::class);
+        $this->warningCollectionFactoryMock = $this->getMockBuilder(WarningCollectionFactory::class)
+            ->disableOriginalConstructor()
+            ->setMethods(['create'])
+            ->getMock();
+        $this->warningCollectionMock = $this->createMock(WarningCollection::class);
+        $this->warningFactoryMock = $this->getMockBuilder(WarningFactory::class)
+            ->disableOriginalConstructor()
+            ->setMethods(['create'])
+            ->getMock();
+        $this->warningMock = $this->createMock(Warning::class);
         $this->objectManager = new ObjectManager($this);
     }
 
@@ -65,7 +104,9 @@ class StepExecutionTest extends TestCase
             StepExecution::class,
             [
                 'jobExecutionRepository' => $this->jobExecutionRepositoryMock,
-                'serializer' => $this->serializerMock
+                'serializer' => $this->serializerMock,
+                'warningCollectionFactory' => $this->warningCollectionFactoryMock,
+                'warningFactory' => $this->warningFactoryMock
             ]
         );
     }
@@ -182,7 +223,7 @@ class StepExecutionTest extends TestCase
         $this->assertSame($this->jobParametersMock, $stepExecution->getJobParameters());
     }
 
-    public function testGetFailureExecptions()
+    public function testGetFailureExceptions()
     {
         $stepExecution = $this->getStepExecutionObject();
         $stepExecution->setData('failure_exceptions', null);
@@ -248,6 +289,196 @@ class StepExecutionTest extends TestCase
         $this->assertcount(3, $stepExecution->getFailureExceptions());
     }
 
+    public function testGetErrors()
+    {
+        $stepExecution = $this->getStepExecutionObject();
+        $stepExecution->setData('errors', null);
+
+        $this->assertEquals([], $stepExecution->getErrors());
+
+        $stepExecution->setData('errors', '{"key":"value"}');
+
+        $this->serializerMock->expects($this->once())
+            ->method('unserialize')
+            ->with('{"key":"value"}')
+            ->willReturn(['key' => 'value']);
+
+        $this->assertEquals(['key' => 'value'], $stepExecution->getErrors());
+
+        $stepExecution->setData('errors', ['key' => 'value']);
+
+        $this->assertEquals(['key' => 'value'], $stepExecution->getErrors());
+
+        $stepExecution->setData('errors', 11);
+
+        $this->assertEquals([], $stepExecution->getErrors());
+    }
+
+    public function testAddError()
+    {
+        $stepExecution = $this->getStepExecutionObject();
+        $stepExecution->setData('errors', null);
+
+        $stepExecution->addError('first_error');
+
+        $this->assertEquals(['first_error'], $stepExecution->getData('errors'));
+
+        $stepExecution->addError('second_error');
+
+        $this->assertEquals(['first_error', 'second_error'], $stepExecution->getData('errors'));
+    }
+
+    public function testGetWarnings()
+    {
+        $stepExecution = $this->getStepExecutionObject();
+
+        $this->warningCollectionFactoryMock->expects($this->once())
+            ->method('create')
+            ->willReturn($this->warningCollectionMock);
+
+        $this->warningCollectionMock->expects($this->once())
+            ->method('setStepExecutionFilter')
+            ->with($stepExecution)
+            ->willReturnSelf();
+
+        $this->warningCollectionMock->expects($this->once())
+            ->method('getItems')
+            ->willReturn([]);
+
+        $stepExecution->getWarnings();
+    }
+
+    public function testAddWarning()
+    {
+        $stepExecution = $this->getStepExecutionObject();
+
+        $this->warningCollectionFactoryMock->expects($this->once())
+            ->method('create')
+            ->willReturn($this->warningCollectionMock);
+
+        $this->warningCollectionMock->expects($this->once())
+            ->method('setStepExecutionFilter')
+            ->willReturnSelf();
+
+        $this->warningFactoryMock->expects($this->once())
+            ->method('create')
+            ->willReturn($this->warningMock);
+
+        $this->warningMock->expects($this->once())
+            ->method('setReason')
+            ->with('reason')
+            ->willReturnSelf();
+
+        $this->warningMock->expects($this->once())
+            ->method('setReasonParameters')
+            ->with(['param1', 'param2'])
+            ->willReturnSelf();
+
+        /** @var \PHPUnit_Framework_MockObject_MockObject|InvalidItemInterface $invalidItemInterfaceMock */
+        $invalidItemInterfaceMock = $this->createMock(InvalidItemInterface::class);
+
+        $invalidItemInterfaceMock->expects($this->once())
+            ->method('getInvalidData')
+            ->willReturn(['data']);
+
+        $this->warningMock->expects($this->once())
+            ->method('setItem')
+            ->with(['data'])
+            ->willReturnSelf();
+
+        $this->warningMock->expects($this->once())
+            ->method('setStepExecution')
+            ->with($stepExecution)
+            ->willReturnSelf();
+
+        $this->warningCollectionMock->expects($this->once())
+            ->method('addItem')
+            ->with($this->warningMock)
+            ->willReturnSelf();
+
+        $this->warningCollectionMock->expects($this->once())
+            ->method('save');
+
+        $stepExecution->addWarning(
+            'reason',
+            ['param1', 'param2'],
+            $invalidItemInterfaceMock
+        );
+    }
+
+    public function testGetSummary()
+    {
+        $stepExecution = $this->getStepExecutionObject();
+        $stepExecution->setData('summary', null);
+
+        $this->assertEquals([], $stepExecution->getSummary());
+
+        $stepExecution->setData('summary', '{"key":"value"}');
+
+        $this->serializerMock->expects($this->once())
+            ->method('unserialize')
+            ->with('{"key":"value"}')
+            ->willReturn(['key' => 'value']);
+
+        $this->assertEquals(['key' => 'value'], $stepExecution->getSummary());
+
+        $stepExecution->setData('summary', ['key' => 'value']);
+
+        $this->assertEquals(['key' => 'value'], $stepExecution->getSummary());
+
+        $stepExecution->setData('summary', 11);
+
+        $this->assertEquals([], $stepExecution->getSummary());
+    }
+
+    public function testGetSummaryInfo()
+    {
+        $stepExecution = $this->getStepExecutionObject();
+        $stepExecution->setData('summary', null);
+
+        $this->assertSame('', $stepExecution->getSummaryInfo('absent'));
+
+        $stepExecution->setData('summary', '{"key":"value"}');
+
+        $this->serializerMock->expects($this->once())
+            ->method('unserialize')
+            ->with('{"key":"value"}')
+            ->willReturn(['key' => 'value']);
+
+        $this->assertSame('value', $stepExecution->getSummaryInfo('key'));
+    }
+
+    public function testAddSummaryInfo()
+    {
+        $stepExecution = $this->getStepExecutionObject();
+        $stepExecution->setData('summary', null);
+
+        $stepExecution->addSummaryInfo('first key', 'first info');
+
+        $this->assertEquals(['first key' => 'first info'], $stepExecution->getData('summary'));
+
+        $stepExecution->addSummaryInfo('second key', 'second info');
+
+        $this->assertEquals(
+            ['first key' => 'first info', 'second key' => 'second info'],
+            $stepExecution->getSummary()
+        );
+    }
+
+    public function testIncrementSummaryInfo()
+    {
+        $stepExecution = $this->getStepExecutionObject();
+        $stepExecution->setData('summary', null);
+
+        $stepExecution->incrementSummaryInfo('key', 1);
+
+        $this->assertEquals(['key' => 1], $stepExecution->getData('summary'));
+
+        $stepExecution->incrementSummaryInfo('key');
+
+        $this->assertEquals(['key' => 2], $stepExecution->getData('summary'));
+    }
+
     public function testBeforeSaveStatus()
     {
         $stepExecution = $this->getStepExecutionObject();
@@ -287,6 +518,64 @@ class StepExecutionTest extends TestCase
         $this->assertEquals(
             '[{"key":"value"}]',
             $stepExecution->getData('failure_exceptions')
+        );
+    }
+
+    public function testBeforeSaveErrorsWithoutValues()
+    {
+        $stepExecution = $this->getStepExecutionObject();
+        $stepExecution->setData('errors', null);
+
+        $this->serializerMock->expects($this->never())
+            ->method('serialize');
+
+        $stepExecution->beforeSave();
+    }
+
+    public function testBeforeSaveErrors()
+    {
+        $stepExecution = $this->getStepExecutionObject();
+        $stepExecution->setData('errors', [['key' => 'value']]);
+
+        $this->serializerMock->expects($this->once())
+            ->method('serialize')
+            ->with([['key' => 'value']])
+            ->willReturn('[{"key":"value"}]');
+
+        $stepExecution->beforeSave();
+
+        $this->assertEquals(
+            '[{"key":"value"}]',
+            $stepExecution->getData('errors')
+        );
+    }
+
+    public function testBeforeSaveSummaryValues()
+    {
+        $stepExecution = $this->getStepExecutionObject();
+        $stepExecution->setData('summary', null);
+
+        $this->serializerMock->expects($this->never())
+            ->method('serialize');
+
+        $stepExecution->beforeSave();
+    }
+
+    public function testBeforeSummary()
+    {
+        $stepExecution = $this->getStepExecutionObject();
+        $stepExecution->setData('summary', [['key' => 'value']]);
+
+        $this->serializerMock->expects($this->once())
+            ->method('serialize')
+            ->with([['key' => 'value']])
+            ->willReturn('[{"key":"value"}]');
+
+        $stepExecution->beforeSave();
+
+        $this->assertEquals(
+            '[{"key":"value"}]',
+            $stepExecution->getData('summary')
         );
     }
 

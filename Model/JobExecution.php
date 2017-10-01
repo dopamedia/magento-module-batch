@@ -62,27 +62,27 @@ class JobExecution extends AbstractModel implements JobExecutionInterface
     /**
      * @var null|JobInstanceInterface
      */
-    private $jobInstance = null;
+    private $jobInstance;
 
     /**
      * @var null|ExitStatus
      */
-    private $exitStatus = null;
+    private $exitStatus;
 
     /**
      * @var null|ExecutionContext
      */
-    private $executionContext = null;
+    private $executionContext;
 
     /**
      * @var null|JobParameters
      */
-    private $jobParameters = null;
+    private $jobParameters;
 
     /**
      * @var null|StepExecutionCollection
      */
-    private $stepExecutionCollection = null;
+    private $stepExecutionCollection;
 
     /**
      * JobExecution constructor.
@@ -234,6 +234,27 @@ class JobExecution extends AbstractModel implements JobExecutionInterface
     }
 
     /**
+     * @return StepExecutionCollection
+     */
+    private function getStepExecutionCollection(): StepExecutionCollection
+    {
+        if ($this->stepExecutionCollection === null) {
+            $this->stepExecutionCollection = $this->stepExecutionCollectionFactory->create()
+                ->setJobExecutionFilter($this);
+        }
+
+        return $this->stepExecutionCollection;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getStepExecutions(): array
+    {
+        return $this->getStepExecutionCollection()->getItems();
+    }
+
+    /**
      * @param StepExecutionInterface|DataObject $stepExecution
      * @return JobExecutionInterface
      * @throws \Exception
@@ -243,20 +264,6 @@ class JobExecution extends AbstractModel implements JobExecutionInterface
         $this->getStepExecutionCollection()->addItem($stepExecution);
 
         return $this;
-    }
-
-    /**
-     * @return StepExecutionCollection
-     */
-    private function getStepExecutionCollection(): StepExecutionCollection
-    {
-        if ($this->stepExecutionCollection === null) {
-            $this->stepExecutionCollection = $this->stepExecutionCollectionFactory
-                ->create()
-                ->setJobExecutionFilter($this);
-        }
-
-        return $this->stepExecutionCollection;
     }
 
     /**
@@ -455,14 +462,6 @@ class JobExecution extends AbstractModel implements JobExecutionInterface
         }
 
         return $allExceptions;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getStepExecutions(): array
-    {
-        return $this->getStepExecutionCollection()->getItems();
     }
 
     /**

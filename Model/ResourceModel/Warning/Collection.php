@@ -8,6 +8,7 @@ namespace Dopamedia\Batch\Model\ResourceModel\Warning;
 
 use Dopamedia\Batch\Model\ResourceModel\Warning as ResourceWarning;
 use Dopamedia\Batch\Model\Warning;
+use Dopamedia\PhpBatch\StepExecutionInterface;
 use Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection;
 
 /**
@@ -22,5 +23,16 @@ class Collection extends AbstractCollection
     protected function _construct()
     {
         $this->_init(Warning::class, ResourceWarning::class);
+    }
+
+    /**
+     * @param StepExecutionInterface $stepExecution
+     * @return Collection
+     */
+    public function setStepExecutionFilter(StepExecutionInterface $stepExecution): Collection
+    {
+        $this->addFieldToFilter(Warning::STEP_EXECUTION_ID, $stepExecution->getId());
+
+        return $this;
     }
 }

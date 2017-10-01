@@ -11,10 +11,15 @@ use Dopamedia\Batch\Model\ResourceModel\StepExecution as ResouceStepExecution;
 use Dopamedia\PhpBatch\BatchStatus;
 use Dopamedia\PhpBatch\ExitStatus;
 use Dopamedia\PhpBatch\Item\ExecutionContext;
+use Dopamedia\PhpBatch\Item\InvalidItemInterface;
 use Dopamedia\PhpBatch\Job\RuntimeErrorException;
 use Dopamedia\PhpBatch\JobExecutionInterface;
 use Dopamedia\PhpBatch\Job\JobParameters;
 use Dopamedia\PhpBatch\StepExecutionInterface;
+use Dopamedia\Batch\Model\ResourceModel\Warning\Collection as WarningCollection;
+use Dopamedia\Batch\Model\ResourceModel\Warning\CollectionFactory as WarningCollectionFactory;
+use Dopamedia\PhpBatch\WarningInterface;
+use Magento\Framework\DataObject;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Model\AbstractModel;
 use Magento\Framework\Serialize\Serializer\Json as Serializer;
@@ -38,7 +43,7 @@ class StepExecution extends AbstractModel implements StepExecutionInterface
     public const EXIT_DESCRIPTION = 'exit_description';
     public const TERMINATE_ONLY = 'terminate_only';
     public const FAILURE_EXCEPTIONS = 'failure_exceptions';
-    public const ERRORS = 'errros';
+    public const ERRORS = 'errors';
     public const SUMMARY = 'summary';
     public const JOB_EXECUTION_ID = 'job_execution_id';
     /**#@-*/
@@ -69,13 +74,39 @@ class StepExecution extends AbstractModel implements StepExecutionInterface
     private $serializer;
 
     /**
-     * @inheritDoc
+     * @var WarningCollectionFactory
+     */
+    private $warningCollectionFactory;
+
+    /**
+     * @var WarningFactory
+     */
+    private $warningFactory;
+
+    /**
+     * @var null|WarningCollection
+     */
+    private $warningCollection;
+
+    /**
+     * StepExecution constructor.
+     * @param \Magento\Framework\Model\Context $context
+     * @param \Magento\Framework\Registry $registry
+     * @param JobExecutionRepositoryInterface $jobExecutionRepository
+     * @param Serializer $serializer
+     * @param WarningCollectionFactory $warningCollectionFactory
+     * @param WarningFactory $warningFactory
+     * @param \Magento\Framework\Model\ResourceModel\AbstractResource|null $resource
+     * @param \Magento\Framework\Data\Collection\AbstractDb|null $resourceCollection
+     * @param array $data
      */
     public function __construct(
         \Magento\Framework\Model\Context $context,
         \Magento\Framework\Registry $registry,
         JobExecutionRepositoryInterface $jobExecutionRepository,
         Serializer $serializer,
+        WarningCollectionFactory $warningCollectionFactory,
+        WarningFactory $warningFactory,
         \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
         \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
         array $data = []
@@ -84,6 +115,8 @@ class StepExecution extends AbstractModel implements StepExecutionInterface
         parent::__construct($context, $registry, $resource, $resourceCollection, $data);
         $this->jobExecutionRepository = $jobExecutionRepository;
         $this->serializer = $serializer;
+        $this->warningCollectionFactory = $warningCollectionFactory;
+        $this->warningFactory = $warningFactory;
         $this->setStartTime(new \DateTime());
     }
 
@@ -406,6 +439,141 @@ class StepExecution extends AbstractModel implements StepExecutionInterface
     }
 
     /**
+     * @inheritDoc
+     */
+    public function getErrors(): array
+    {
+        if (is_string($this->getData(self::ERRORS))) {
+            return $this->serializer->unserialize($this->getData(self::ERRORS));
+        } elseif ($this->getData(self::ERRORS) === null) {
+            return [];
+        }
+
+        return is_array($this->getData(self::ERRORS)) ? $this->getData(self::ERRORS) : [];
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function addError(string $message): StepExecutionInterface
+    {
+        $errors = $this->getErrors();
+
+        $errors[] = $message;
+
+        return $this->setData(self::ERRORS, $errors);
+    }
+
+    /**
+     * @return WarningCollection
+     */
+    private function getWarningCollection(): WarningCollection
+    {
+        if ($this->warningCollection === null) {
+            $this->warningCollection = $this->warningCollectionFactory->create()
+                ->setStepExecutionFilter($this);
+        }
+
+        return $this->warningCollection;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getWarnings(): array
+    {
+        return $this->getWarningCollection()->getItems();
+    }
+
+    /**
+     * @param string $reason
+     * @param array $reasonParameters
+     * @param InvalidItemInterface $item
+     * @return StepExecutionInterface
+     * @throws \Exception
+     */
+    public function addWarning(
+        string $reason,
+        array $reasonParameters,
+        InvalidItemInterface $item
+    ): StepExecutionInterface
+    {
+        $data = $item->getInvalidData() ?? [];
+
+        /** @var WarningInterface|DataObject $warning */
+        $warning = $this->warningFactory->create()
+            ->setReason($reason)
+            ->setReasonParameters($reasonParameters)
+            ->setItem($data)
+            ->setStepExecution($this);
+
+        $this->getWarningCollection()->addItem($warning)->save();
+
+        return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getSummary(): array
+    {
+        if (is_string($this->getData(self::SUMMARY))) {
+            return $this->serializer->unserialize($this->getData(self::SUMMARY));
+        } elseif ($this->getData(self::SUMMARY) === null) {
+            return [];
+        }
+
+        return is_array($this->getData(self::SUMMARY)) ? $this->getData(self::SUMMARY) : [];
+    }
+
+    /**
+     * @inheritDoc
+     * @codeCoverageIgnore
+     */
+    public function setSummary(array $summary): StepExecutionInterface
+    {
+        return $this->setData(self::SUMMARY, $summary);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getSummaryInfo(string $key)
+    {
+        $summary = $this->getSummary();
+
+        return isset($summary[$key]) ? $summary[$key] : '';
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function addSummaryInfo(string $key, $info): StepExecutionInterface
+    {
+        $summary = $this->getSummary();
+
+        $summary[$key] = $info;
+
+        return $this->setSummary($summary);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function incrementSummaryInfo(string $key, int $increment = 1): StepExecutionInterface
+    {
+        $summary = $this->getSummary();
+
+        if (!isset($summary[$key])) {
+            $summary[$key] = $increment;
+        } else {
+            $summary[$key] = $summary[$key] + $increment;
+        }
+
+        return $this->setSummary($summary);
+    }
+
+    /**
      * @inheritdoc
      */
     public function beforeSave()
@@ -422,8 +590,18 @@ class StepExecution extends AbstractModel implements StepExecutionInterface
             $this->setData(self::FAILURE_EXCEPTIONS, $this->serializer->serialize($failureExceptions));
         }
 
+        $errors = $this->getData(self::ERRORS);
+
+        if (is_array($errors)) {
+            $this->setData(self::ERRORS, $this->serializer->serialize($errors));
+        }
+
+        $summary = $this->getData(self::SUMMARY);
+
+        if (is_array($summary)) {
+            $this->setData(self::SUMMARY, $this->serializer->serialize($summary));
+        }
+
         return parent::beforeSave();
     }
-
-
 }

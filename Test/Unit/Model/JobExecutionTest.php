@@ -110,9 +110,6 @@ class JobExecutionTest extends TestCase
         $this->assertNull($jobExecution->getJobInstance());
     }
 
-    /**
-     * @group current
-     */
     public function testGetJobInstanceWithNoSuchEntityException()
     {
         $this->jobInstanceRepositoryMock->expects($this->once())
