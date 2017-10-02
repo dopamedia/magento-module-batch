@@ -115,7 +115,7 @@ class ReaderTest extends TestCase
             ->method('getJobParameters')
             ->willReturn($this->jobParametersMock);
 
-        $this->jobParametersMock->expects($this->at(0))
+        $this->jobParametersMock->expects($this->at(3))
             ->method('get')
             ->with('filePath')
             ->willReturn('the/file/path');
@@ -148,7 +148,7 @@ class ReaderTest extends TestCase
             ->method('getJobParameters')
             ->willReturn($this->jobParametersMock);
 
-        $this->jobParametersMock->expects($this->at(0))
+        $this->jobParametersMock->expects($this->at(3))
             ->method('get')
             ->with('filePath')
             ->willReturn('the/file/path');
@@ -177,7 +177,7 @@ class ReaderTest extends TestCase
             ->method('getJobParameters')
             ->willReturn($this->jobParametersMock);
 
-        $this->jobParametersMock->expects($this->at(0))
+        $this->jobParametersMock->expects($this->at(3))
             ->method('get')
             ->with('filePath')
             ->willReturn('the/file/path');
