@@ -15,6 +15,7 @@
     <preference for="Dopamedia\PhpBatch\Item\ItemProcessorInterface" type="Dopamedia\Batch\Processor\NoopProcessor" />
     <preference for="Dopamedia\PhpBatch\Item\ItemWriterInterface" type="Dopamedia\Batch\Writer\NoopWriter" />
     <preference for="Dopamedia\Batch\Reader\File\FileIteratorInterface" type="Dopamedia\Batch\Reader\File\FlatFileIterator" />
+    <preference for="Dopamedia\Batch\Reader\File\HeaderProviderInterface" type="Dopamedia\Batch\Reader\File\FirstRowHeaderProvider" />
 
     <type name="Magento\Framework\Console\CommandListInterface">
         <arguments>

@@ -8,6 +8,7 @@ namespace Dopamedia\Batch\Reader\File\Csv;
 
 use Dopamedia\Batch\Reader\File\FileIteratorInterface;
 use Dopamedia\Batch\Reader\File\FileIteratorInterfaceFactory;
+use Dopamedia\Batch\Reader\File\HeaderProviderInterface;
 use Dopamedia\PhpBatch\Item\FileInvalidItem;
 use Dopamedia\PhpBatch\Item\FlushableInterface;
 use Dopamedia\PhpBatch\Item\InvalidItemException;
@@ -23,10 +24,6 @@ class Reader implements ItemReaderInterface, StepExecutionAwareInterface, Flusha
 {
     use StepExecutionAwareTrait;
 
-    private const PARAMETER_KEY_FILE_PATH = 'filePath';
-    private const PARAMETER_KEY_DELIMITER = 'delimiter';
-    private const PARAMETER_KEY_ENCLOSURE = 'enclosure';
-
     /**
      * @var FileIteratorInterfaceFactory
      */
@@ -41,18 +38,25 @@ class Reader implements ItemReaderInterface, StepExecutionAwareInterface, Flusha
      * @var FileIteratorInterface
      */
     private $fileIterator;
+    /**
+     * @var HeaderProviderInterface
+     */
+    private $headerProvider;
 
     /**
      * Reader constructor.
      * @param FileIteratorInterfaceFactory $fileIteratorFactory
+     * @param HeaderProviderInterface $headerProvider
      * @param array $options
      */
     public function __construct(
         FileIteratorInterfaceFactory $fileIteratorFactory,
+        HeaderProviderInterface $headerProvider,
         array $options = []
     )
     {
         $this->fileIteratorFactory = $fileIteratorFactory;
+        $this->headerProvider = $headerProvider;
         $this->options = $options;
     }
 
@@ -63,11 +67,11 @@ class Reader implements ItemReaderInterface, StepExecutionAwareInterface, Flusha
     public function read()
     {
         $jobParameters = $this->stepExecution->getJobParameters();
-        $filePath = $jobParameters->get(self::PARAMETER_KEY_FILE_PATH);
+        $filePath = $jobParameters->get('filePath');
 
         if ($this->fileIterator === null) {
-            $delimiter = $jobParameters->get(self::PARAMETER_KEY_DELIMITER);
-            $enclosure = $jobParameters->get(self::PARAMETER_KEY_ENCLOSURE);
+            $delimiter = $jobParameters->get('delimiter');
+            $enclosure = $jobParameters->get('enclosure');
             $defaultOptions = [
                 'reader_options' => [
                     'fieldDelimiter' => $delimiter,
@@ -79,6 +83,7 @@ class Reader implements ItemReaderInterface, StepExecutionAwareInterface, Flusha
             $this->fileIterator = $this->fileIteratorFactory->create([
                 'type' => 'csv',
                 'filePath' => $filePath,
+                'headerProvider' => $this->headerProvider,
                 'options' => array_merge($defaultOptions, $this->options)
             ]);
 

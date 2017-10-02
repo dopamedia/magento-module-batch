@@ -48,11 +48,16 @@ class FlatFileIterator implements FileIteratorInterface
      * @var array
      */
     protected $headers;
+    /**
+     * @var HeaderProviderInterface
+     */
+    private $headerProvider;
 
     /**
-     * FileIterator constructor.
+     * FlatFileIterator constructor.
      * @param string $type
      * @param string $filePath
+     * @param HeaderProviderInterface $headerProvider
      * @param array $options
      * @param FilesystemFactory $filesystemFactory
      * @throws \Box\Spout\Common\Exception\IOException
@@ -62,6 +67,7 @@ class FlatFileIterator implements FileIteratorInterface
     public function __construct(
         string $type,
         string $filePath,
+        HeaderProviderInterface $headerProvider,
         array $options = [],
         FilesystemFactory $filesystemFactory
     )
@@ -69,6 +75,7 @@ class FlatFileIterator implements FileIteratorInterface
         $this->type = $type;
         $this->filePath = $filePath;
         $this->filesystem = $filesystemFactory->create();
+        $this->headerProvider = $headerProvider;
 
         if ($this->filesystem->exists($filePath) === false) {
             throw new FileNotFoundException(sprintf('File "%s" could not be found', $this->filePath));
@@ -84,7 +91,7 @@ class FlatFileIterator implements FileIteratorInterface
         $sheet = $this->reader->getSheetIterator()->current();
         $sheet->getRowIterator()->rewind();
 
-        $this->headers = $sheet->getRowIterator()->current();
+        $this->headers = $this->headerProvider->getHeaders($sheet);
         $this->rows = $sheet->getRowIterator();
     }
 

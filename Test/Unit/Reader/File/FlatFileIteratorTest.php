@@ -7,6 +7,7 @@
 namespace Dopamedia\Batch\Test\Unit\Reader\File;
 
 use Dopamedia\Batch\Reader\File\FlatFileIterator;
+use Dopamedia\Batch\Reader\File\HeaderProviderInterface;
 use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\FilesystemFactory;
@@ -25,6 +26,11 @@ class FlatFileIteratorTest extends TestCase
     protected $filesystemMock;
 
     /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|HeaderProviderInterface
+     */
+    protected $headerProviderMock;
+
+    /**
      * @var string
      */
     protected $filePath;
@@ -37,6 +43,8 @@ class FlatFileIteratorTest extends TestCase
             ->getMock();
 
         $this->filesystemMock = $this->createMock(Filesystem::class);
+
+        $this->headerProviderMock = $this->createMock(HeaderProviderInterface::class);
 
         $this->filePath = realpath(__DIR__) . '/FlatFileIteratorTest/_files/dummy.csv';
     }
@@ -58,6 +66,7 @@ class FlatFileIteratorTest extends TestCase
         new FlatFileIterator(
             '',
             'absent.csv',
+            $this->headerProviderMock,
             [],
             $this->filesystemFactoryMock
         );
@@ -75,6 +84,7 @@ class FlatFileIteratorTest extends TestCase
         new FlatFileIterator(
             'csv',
             $this->filePath,
+            $this->headerProviderMock,
             ['reader_options' => ['unknown' => true]],
             $this->filesystemFactoryMock
         );
@@ -89,6 +99,7 @@ class FlatFileIteratorTest extends TestCase
         $flatFileIterator = new FlatFileIterator(
             'csv',
             $this->filePath,
+            $this->headerProviderMock,
             ['reader_options' => ['fieldDelimiter' => ';']],
             $this->filesystemFactoryMock
         );
@@ -111,6 +122,7 @@ class FlatFileIteratorTest extends TestCase
         $flatFileIterator = new FlatFileIterator(
             'csv',
             $this->filePath,
+            $this->headerProviderMock,
             ['reader_options' => ['fieldDelimiter' => ';']],
             $this->filesystemFactoryMock
         );
@@ -130,6 +142,7 @@ class FlatFileIteratorTest extends TestCase
         $flatFileIterator = new FlatFileIterator(
             'csv',
             $this->filePath,
+            $this->headerProviderMock,
             ['reader_options' => ['fieldDelimiter' => ';']],
             $this->filesystemFactoryMock
         );
@@ -154,6 +167,7 @@ class FlatFileIteratorTest extends TestCase
         $flatFileIterator = new FlatFileIterator(
             'csv',
             $this->filePath,
+            $this->headerProviderMock,
             ['reader_options' => ['fieldDelimiter' => ';']],
             $this->filesystemFactoryMock
         );
@@ -174,14 +188,18 @@ class FlatFileIteratorTest extends TestCase
             ->method('create')
             ->willReturn($this->filesystemMock);
 
+        $this->headerProviderMock->expects($this->any())
+            ->method('getHeaders')
+            ->willReturn(['header', 'row']);
+
         $flatFileIterator = new FlatFileIterator(
             'csv',
             $this->filePath,
+            $this->headerProviderMock,
             ['reader_options' => ['fieldDelimiter' => ';']],
             $this->filesystemFactoryMock
         );
 
         $this->assertEquals(['header', 'row'], $flatFileIterator->getHeaders());
     }
-
 }
