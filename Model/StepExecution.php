@@ -153,7 +153,7 @@ class StepExecution extends AbstractModel implements StepExecutionInterface, Ser
      */
     public function setId($id)
     {
-        return $this->setData(self::ID);
+        return $this->setData(self::ID, $id);
     }
 
     /**
