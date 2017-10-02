@@ -12,8 +12,10 @@
         <whitelist addUncoveredFilesFromWhiteList="true">
             <directory suffix=".php">Adapter</directory>
             <directory suffix=".php">Console</directory>
+            <directory suffix=".php">Item</directory>
             <directory suffix=".php">Model</directory>
             <directory suffix=".php">Processor</directory>
+            <directory suffix=".php">Step</directory>
             <directory suffix=".php">Reader</directory>
             <directory suffix=".php">Writer</directory>
         </whitelist>

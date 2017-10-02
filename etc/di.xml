@@ -17,6 +17,12 @@
     <preference for="Dopamedia\Batch\Reader\File\FileIteratorInterface" type="Dopamedia\Batch\Reader\File\FlatFileIterator" />
     <preference for="Dopamedia\Batch\Reader\File\HeaderProviderInterface" type="Dopamedia\Batch\Reader\File\FirstRowHeaderProvider" />
 
+    <type name="Dopamedia\Batch\Step\ValidatorStep">
+        <arguments>
+            <argument name="name" xsi:type="string">Validate File</argument>
+        </arguments>
+    </type>
+
     <type name="Magento\Framework\Console\CommandListInterface">
         <arguments>
             <argument name="commands" xsi:type="array">
