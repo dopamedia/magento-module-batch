@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "be2fb4e0a14a1bd52363a58894edcd7d",
+    "content-hash": "d5694378383282027d4381bab55241ce",
     "packages": [
         {
             "name": "box/spout",
@@ -479,6 +479,46 @@
             ],
             "description": "N/A",
             "time": "2017-10-02 08:40:39"
+        },
+        {
+            "name": "firegento/fastsimpleimport",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/firegento/FireGento_FastSimpleImport2.git",
+                "reference": "76f13957df9d6e7489a8066d4c76edc5ce12a038"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/firegento/FireGento_FastSimpleImport2/zipball/76f13957df9d6e7489a8066d4c76edc5ce12a038",
+                "reference": "76f13957df9d6e7489a8066d4c76edc5ce12a038",
+                "shasum": ""
+            },
+            "require": {
+                "php": "~5.5.0|~5.6.0|~7.0"
+            },
+            "type": "magento2-module",
+            "autoload": {
+                "files": [
+                    "registration.php"
+                ],
+                "psr-4": {
+                    "FireGento\\FastSimpleImport\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-3.0"
+            ],
+            "authors": [
+                {
+                    "name": "Team FireGento",
+                    "email": "team@firegento.com"
+                }
+            ],
+            "description": "Wrapper for Magento2 ImportExport functionality, which imports products and customers from arrays",
+            "homepage": "https://github.com/firegento/FireGento_FastSimpleImport2",
+            "time": "2017-09-12 13:19:06"
         },
         {
             "name": "justinrainbow/json-schema",
@@ -3752,7 +3792,8 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "dopamedia/php-batch": 20
+        "dopamedia/php-batch": 20,
+        "firegento/fastsimpleimport": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,
