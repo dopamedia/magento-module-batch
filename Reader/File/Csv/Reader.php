@@ -7,7 +7,7 @@
 namespace Dopamedia\Batch\Reader\File\Csv;
 
 use Dopamedia\Batch\Reader\File\FileIteratorInterface;
-use Dopamedia\Batch\Reader\File\FlatFileIteratorFactory;
+use Dopamedia\Batch\Reader\File\FileIteratorInterfaceFactory;
 use Dopamedia\PhpBatch\Item\FileInvalidItem;
 use Dopamedia\PhpBatch\Item\FlushableInterface;
 use Dopamedia\PhpBatch\Item\InvalidItemException;
@@ -28,9 +28,9 @@ class Reader implements ItemReaderInterface, StepExecutionAwareInterface, Flusha
     private const PARAMETER_KEY_ENCLOSURE = 'enclosure';
 
     /**
-     * @var FlatFileIteratorFactory
+     * @var FileIteratorInterfaceFactory
      */
-    private $flatFileIteratorFactory;
+    private $fileIteratorFactory;
 
     /**
      * @var array
@@ -40,19 +40,19 @@ class Reader implements ItemReaderInterface, StepExecutionAwareInterface, Flusha
     /**
      * @var FileIteratorInterface
      */
-    private $flatFileIterator;
+    private $fileIterator;
 
     /**
      * Reader constructor.
-     * @param FlatFileIteratorFactory $flatFileIteratorFactory
+     * @param FileIteratorInterfaceFactory $fileIteratorFactory
      * @param array $options
      */
     public function __construct(
-        FlatFileIteratorFactory $flatFileIteratorFactory,
+        FileIteratorInterfaceFactory $fileIteratorFactory,
         array $options = []
     )
     {
-        $this->flatFileIteratorFactory = $flatFileIteratorFactory;
+        $this->fileIteratorFactory = $fileIteratorFactory;
         $this->options = $options;
     }
 
@@ -65,7 +65,7 @@ class Reader implements ItemReaderInterface, StepExecutionAwareInterface, Flusha
         $jobParameters = $this->stepExecution->getJobParameters();
         $filePath = $jobParameters->get(self::PARAMETER_KEY_FILE_PATH);
 
-        if ($this->flatFileIterator === null) {
+        if ($this->fileIterator === null) {
             $delimiter = $jobParameters->get(self::PARAMETER_KEY_DELIMITER);
             $enclosure = $jobParameters->get(self::PARAMETER_KEY_ENCLOSURE);
             $defaultOptions = [
@@ -75,29 +75,29 @@ class Reader implements ItemReaderInterface, StepExecutionAwareInterface, Flusha
                 ],
             ];
 
-            /** @var FileIteratorInterface flatFileIterator */
-            $this->flatFileIterator = $this->flatFileIteratorFactory->create([
+            /** @var FileIteratorInterface fileIterator */
+            $this->fileIterator = $this->fileIteratorFactory->create([
                 'type' => 'csv',
                 'filePath' => $filePath,
                 'options' => array_merge($defaultOptions, $this->options)
             ]);
 
-            $this->flatFileIterator->rewind();
+            $this->fileIterator->rewind();
         }
 
-        $this->flatFileIterator->next();
+        $this->fileIterator->next();
 
-        if ($this->flatFileIterator->valid() === true) {
+        if ($this->fileIterator->valid() === true) {
             $this->stepExecution->incrementSummaryInfo('item_position');
         }
 
-        $data = $this->flatFileIterator->current();
+        $data = $this->fileIterator->current();
 
         if ($data === null) {
             return null;
         }
 
-        $headers = $this->flatFileIterator->getHeaders();
+        $headers = $this->fileIterator->getHeaders();
 
         $countHeaders = count($headers);
         $countData = count($data);
@@ -119,7 +119,7 @@ class Reader implements ItemReaderInterface, StepExecutionAwareInterface, Flusha
      */
     public function flush(): void
     {
-        $this->flatFileIterator = null;
+        $this->fileIterator = null;
     }
 
     /**
@@ -139,7 +139,7 @@ class Reader implements ItemReaderInterface, StepExecutionAwareInterface, Flusha
                     $countHeaders,
                     $countData,
                     $filePath,
-                    $this->flatFileIterator->key()
+                    $this->fileIterator->key()
                 ]
             );
         }
