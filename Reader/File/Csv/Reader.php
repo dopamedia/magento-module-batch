@@ -88,6 +88,21 @@ class Reader implements ItemReaderInterface, StepExecutionAwareInterface, Flusha
             return null;
         }
 
+        if ($this->headerProvider->doProcessFirstRow() === true) {
+            $this->fileIterator->next();
+        }
+
+        return $this->prepareData($data, $jobParameters);
+    }
+
+    /**
+     * @param array $data
+     * @param JobParameters $jobParameters
+     * @return array
+     * @throws InvalidItemException
+     */
+    private function prepareData(array $data, JobParameters $jobParameters): array
+    {
         $headers = $this->fileIterator->getHeaders();
 
         $countHeaders = count($headers);
@@ -99,10 +114,6 @@ class Reader implements ItemReaderInterface, StepExecutionAwareInterface, Flusha
             $missingValuesCount = $countHeaders - $countData;
             $missingValues = array_fill(0, $missingValuesCount, '');
             $data = array_merge($data, $missingValues);
-        }
-
-        if ($this->headerProvider->doProcessFirstRow() === true) {
-            $this->fileIterator->next();
         }
 
         return array_combine($headers, $data);
