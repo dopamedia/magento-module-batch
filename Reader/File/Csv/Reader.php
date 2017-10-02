@@ -7,7 +7,7 @@
 namespace Dopamedia\Batch\Reader\File\Csv;
 
 use Dopamedia\Batch\Reader\File\FileIteratorInterface;
-use Dopamedia\Batch\Reader\File\FileIteratorFactory;
+use Dopamedia\Batch\Reader\File\FlatFileIteratorFactory;
 use Dopamedia\PhpBatch\Item\FileInvalidItem;
 use Dopamedia\PhpBatch\Item\FlushableInterface;
 use Dopamedia\PhpBatch\Item\InvalidItemException;
@@ -28,9 +28,9 @@ class Reader implements ItemReaderInterface, StepExecutionAwareInterface, Flusha
     private const PARAMETER_KEY_ENCLOSURE = 'enclosure';
 
     /**
-     * @var FileIteratorFactory
+     * @var FlatFileIteratorFactory
      */
-    private $fileIteratorFactory;
+    private $flatFileIteratorFactory;
 
     /**
      * @var array
@@ -40,33 +40,32 @@ class Reader implements ItemReaderInterface, StepExecutionAwareInterface, Flusha
     /**
      * @var FileIteratorInterface
      */
-    private $fileIterator;
+    private $flatFileIterator;
 
     /**
      * Reader constructor.
-     * @param FileIteratorFactory $fileIteratorFactory
+     * @param FlatFileIteratorFactory $flatFileIteratorFactory
      * @param array $options
      */
     public function __construct(
-        FileIteratorFactory $fileIteratorFactory,
+        FlatFileIteratorFactory $flatFileIteratorFactory,
         array $options = []
     )
     {
-        $this->fileIteratorFactory = $fileIteratorFactory;
+        $this->flatFileIteratorFactory = $flatFileIteratorFactory;
         $this->options = $options;
     }
 
     /**
      * @return array|null
      * @throws InvalidItemException
-     * @throws InvalidItemFromViolationsException
      */
     public function read()
     {
         $jobParameters = $this->stepExecution->getJobParameters();
         $filePath = $jobParameters->get(self::PARAMETER_KEY_FILE_PATH);
 
-        if ($this->fileIterator === null) {
+        if ($this->flatFileIterator === null) {
             $delimiter = $jobParameters->get(self::PARAMETER_KEY_DELIMITER);
             $enclosure = $jobParameters->get(self::PARAMETER_KEY_ENCLOSURE);
             $defaultOptions = [
@@ -76,28 +75,29 @@ class Reader implements ItemReaderInterface, StepExecutionAwareInterface, Flusha
                 ],
             ];
 
-            /** @var FileIteratorInterface fileIterator */
-            $this->fileIterator = $this->fileIteratorFactory->create(
-                $filePath,
-                array_merge($defaultOptions, $this->options)
-            );
+            /** @var FileIteratorInterface flatFileIterator */
+            $this->flatFileIterator = $this->flatFileIteratorFactory->create([
+                'type' => 'csv',
+                'filePath' => $filePath,
+                'options' => array_merge($defaultOptions, $this->options)
+            ]);
 
-            $this->fileIterator->rewind();
+            $this->flatFileIterator->rewind();
         }
 
-        $this->fileIterator->next();
+        $this->flatFileIterator->next();
 
-        if ($this->fileIterator->valid() === true) {
+        if ($this->flatFileIterator->valid() === true) {
             $this->stepExecution->incrementSummaryInfo('item_position');
         }
 
-        $data = $this->fileIterator->current();
+        $data = $this->flatFileIterator->current();
 
         if ($data === null) {
             return null;
         }
 
-        $headers = $this->fileIterator->getHeaders();
+        $headers = $this->flatFileIterator->getHeaders();
 
         $countHeaders = count($headers);
         $countData = count($data);
@@ -119,7 +119,7 @@ class Reader implements ItemReaderInterface, StepExecutionAwareInterface, Flusha
      */
     public function flush(): void
     {
-        $this->fileIterator = null;
+        $this->flatFileIterator = null;
     }
 
     /**
@@ -139,7 +139,7 @@ class Reader implements ItemReaderInterface, StepExecutionAwareInterface, Flusha
                     $countHeaders,
                     $countData,
                     $filePath,
-                    $this->fileIterator->key()
+                    $this->flatFileIterator->key()
                 ]
             );
         }

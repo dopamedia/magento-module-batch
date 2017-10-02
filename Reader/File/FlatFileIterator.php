@@ -14,10 +14,10 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\FilesystemFactory;
 
 /**
- * Class FileIterator
+ * Class FlatFileIterator
  * @package Dopamedia\Batch\Reader\File
  */
-class FileIterator implements FileIteratorInterface
+class FlatFileIterator implements FileIteratorInterface
 {
     /**
      * @var string
@@ -54,6 +54,10 @@ class FileIterator implements FileIteratorInterface
      * @param string $type
      * @param string $filePath
      * @param array $options
+     * @param FilesystemFactory $filesystemFactory
+     * @throws \Box\Spout\Common\Exception\IOException
+     * @throws \Box\Spout\Common\Exception\UnsupportedTypeException
+     * @throws \Box\Spout\Reader\Exception\ReaderNotOpenedException
      */
     public function __construct(
         string $type,

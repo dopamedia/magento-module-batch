@@ -6,14 +6,13 @@
 
 namespace Dopamedia\Batch\Test\Unit\Reader\File;
 
-use Box\Spout\Reader\ReaderFactory;
-use Dopamedia\Batch\Reader\File\FileIterator;
+use Dopamedia\Batch\Reader\File\FlatFileIterator;
 use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\FilesystemFactory;
 use PHPUnit\Framework\TestCase;
 
-class FileIteratorTest extends TestCase
+class FlatFileIteratorTest extends TestCase
 {
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject|FilesystemFactory
@@ -39,7 +38,7 @@ class FileIteratorTest extends TestCase
 
         $this->filesystemMock = $this->createMock(Filesystem::class);
 
-        $this->filePath = realpath(__DIR__) . '/FileIteratorTest/_files/dummy.csv';
+        $this->filePath = realpath(__DIR__) . '/FlatFileIteratorTest/_files/dummy.csv';
     }
 
     public function testConstructWithAbsentFile()
@@ -56,7 +55,7 @@ class FileIteratorTest extends TestCase
         $this->expectException(FileNotFoundException::class);
         $this->expectExceptionMessage('File "absent.csv" could not be found');
 
-        new FileIterator(
+        new FlatFileIterator(
             '',
             'absent.csv',
             [],
@@ -73,7 +72,7 @@ class FileIteratorTest extends TestCase
         $this->expectExceptionMessage(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Option "setUnknown" does not exist in reader "Box\Spout\Reader\CSV\Reader"');
 
-        new FileIterator(
+        new FlatFileIterator(
             'csv',
             $this->filePath,
             ['reader_options' => ['unknown' => true]],
@@ -87,20 +86,20 @@ class FileIteratorTest extends TestCase
             ->method('create')
             ->willReturn($this->filesystemMock);
 
-        $fileIterator = new FileIterator(
+        $flatFileIterator = new FlatFileIterator(
             'csv',
             $this->filePath,
             ['reader_options' => ['fieldDelimiter' => ';']],
             $this->filesystemFactoryMock
         );
 
-        $this->assertEquals(['header', 'row'], $fileIterator->current());
+        $this->assertEquals(['header', 'row'], $flatFileIterator->current());
 
-        $fileIterator->next();
-        $fileIterator->next();
-        $fileIterator->next();
+        $flatFileIterator->next();
+        $flatFileIterator->next();
+        $flatFileIterator->next();
 
-        $this->assertNull($fileIterator->current());
+        $this->assertNull($flatFileIterator->current());
     }
 
     public function testKey()
@@ -109,17 +108,17 @@ class FileIteratorTest extends TestCase
             ->method('create')
             ->willReturn($this->filesystemMock);
 
-        $fileIterator = new FileIterator(
+        $flatFileIterator = new FlatFileIterator(
             'csv',
             $this->filePath,
             ['reader_options' => ['fieldDelimiter' => ';']],
             $this->filesystemFactoryMock
         );
 
-        $fileIterator->rewind();
-        $fileIterator->next();
+        $flatFileIterator->rewind();
+        $flatFileIterator->next();
 
-        $this->assertEquals(2, $fileIterator->key());
+        $this->assertEquals(2, $flatFileIterator->key());
     }
 
     public function testValid()
@@ -128,22 +127,22 @@ class FileIteratorTest extends TestCase
             ->method('create')
             ->willReturn($this->filesystemMock);
 
-        $fileIterator = new FileIterator(
+        $flatFileIterator = new FlatFileIterator(
             'csv',
             $this->filePath,
             ['reader_options' => ['fieldDelimiter' => ';']],
             $this->filesystemFactoryMock
         );
 
-        $fileIterator->rewind();
-        $fileIterator->next();
+        $flatFileIterator->rewind();
+        $flatFileIterator->next();
 
-        $this->assertTrue($fileIterator->valid());
+        $this->assertTrue($flatFileIterator->valid());
 
-        $fileIterator->next();
-        $fileIterator->next();
+        $flatFileIterator->next();
+        $flatFileIterator->next();
 
-        $this->assertFalse($fileIterator->valid());
+        $this->assertFalse($flatFileIterator->valid());
     }
 
     public function testRewind()
@@ -152,21 +151,21 @@ class FileIteratorTest extends TestCase
             ->method('create')
             ->willReturn($this->filesystemMock);
 
-        $fileIterator = new FileIterator(
+        $flatFileIterator = new FlatFileIterator(
             'csv',
             $this->filePath,
             ['reader_options' => ['fieldDelimiter' => ';']],
             $this->filesystemFactoryMock
         );
 
-        $fileIterator->rewind();
+        $flatFileIterator->rewind();
 
-        $this->assertEquals(['header', 'row'], $fileIterator->current());
+        $this->assertEquals(['header', 'row'], $flatFileIterator->current());
 
-        $fileIterator->next();
-        $fileIterator->rewind();
+        $flatFileIterator->next();
+        $flatFileIterator->rewind();
 
-        $this->assertEquals(['header', 'row'], $fileIterator->current());
+        $this->assertEquals(['header', 'row'], $flatFileIterator->current());
     }
 
     public function testGetHeaders()
@@ -175,14 +174,14 @@ class FileIteratorTest extends TestCase
             ->method('create')
             ->willReturn($this->filesystemMock);
 
-        $fileIterator = new FileIterator(
+        $flatFileIterator = new FlatFileIterator(
             'csv',
             $this->filePath,
             ['reader_options' => ['fieldDelimiter' => ';']],
             $this->filesystemFactoryMock
         );
 
-        $this->assertEquals(['header', 'row'], $fileIterator->getHeaders());
+        $this->assertEquals(['header', 'row'], $flatFileIterator->getHeaders());
     }
 
 }

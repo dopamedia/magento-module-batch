@@ -7,8 +7,8 @@
 namespace Dopamedia\Batch\Test\Unit\Reader\File\Csv;
 
 use Dopamedia\Batch\Reader\File\Csv\Reader;
-use Dopamedia\Batch\Reader\File\FileIteratorFactory;
-use Dopamedia\Batch\Reader\File\FileIterator;
+use Dopamedia\Batch\Reader\File\FlatFileIteratorFactory;
+use Dopamedia\Batch\Reader\File\FlatFileIterator;
 use Dopamedia\PhpBatch\Item\InvalidItemException;
 use Dopamedia\PhpBatch\Job\JobParameters;
 use Dopamedia\PhpBatch\StepExecutionInterface;
@@ -17,14 +17,14 @@ use PHPUnit\Framework\TestCase;
 class ReaderTest extends TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|FileIteratorFactory
+     * @var \PHPUnit_Framework_MockObject_MockObject|FlatFileIteratorFactory
      */
-    protected $fileIteratorFactoryMock;
+    protected $flatFileIteratorFactoryMock;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|FileIterator
+     * @var \PHPUnit_Framework_MockObject_MockObject|FlatFileIterator
      */
-    protected $fileIteratorMock;
+    protected $flatFileIteratorMock;
 
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject|StepExecutionInterface
@@ -43,16 +43,16 @@ class ReaderTest extends TestCase
 
     protected function setUp()
     {
-        $this->fileIteratorFactoryMock = $this->getMockBuilder(FileIteratorFactory::class)
+        $this->flatFileIteratorFactoryMock = $this->getMockBuilder(FlatFileIteratorFactory::class)
             ->disableOriginalConstructor()
             ->setMethods(['create'])
             ->getMock();
 
-        $this->fileIteratorMock = $this->createMock(FileIterator::class);
+        $this->flatFileIteratorMock = $this->createMock(FlatFileIterator::class);
 
-        $this->fileIteratorFactoryMock->expects($this->any())
+        $this->flatFileIteratorFactoryMock->expects($this->any())
             ->method('create')
-            ->willReturn($this->fileIteratorMock);
+            ->willReturn($this->flatFileIteratorMock);
 
         $this->stepExecutionMock = $this->createMock(StepExecutionInterface::class);
 
@@ -63,7 +63,7 @@ class ReaderTest extends TestCase
 
     public function testReadIncrementsSummaryInfo()
     {
-        $reader = new Reader($this->fileIteratorFactoryMock);
+        $reader = new Reader($this->flatFileIteratorFactoryMock);
 
         $this->stepExecutionMock->expects($this->once())
             ->method('getJobParameters')
@@ -71,7 +71,7 @@ class ReaderTest extends TestCase
 
         $reader->setStepExecution($this->stepExecutionMock);
 
-        $this->fileIteratorMock->expects($this->once())
+        $this->flatFileIteratorMock->expects($this->once())
             ->method('valid')
             ->willReturn(true);
 
@@ -84,7 +84,7 @@ class ReaderTest extends TestCase
 
     public function testReadReturnsNull()
     {
-        $reader = new Reader($this->fileIteratorFactoryMock);
+        $reader = new Reader($this->flatFileIteratorFactoryMock);
 
         $this->stepExecutionMock->expects($this->once())
             ->method('getJobParameters')
@@ -92,7 +92,7 @@ class ReaderTest extends TestCase
 
         $reader->setStepExecution($this->stepExecutionMock);
 
-        $this->fileIteratorMock->expects($this->once())
+        $this->flatFileIteratorMock->expects($this->once())
             ->method('current')
             ->willReturn(null);
 
@@ -102,7 +102,7 @@ class ReaderTest extends TestCase
 
     public function testReadThrowsInvalidItemException()
     {
-        $reader = new Reader($this->fileIteratorFactoryMock);
+        $reader = new Reader($this->flatFileIteratorFactoryMock);
 
         $this->stepExecutionMock->expects($this->once())
             ->method('getJobParameters')
@@ -115,11 +115,11 @@ class ReaderTest extends TestCase
 
         $reader->setStepExecution($this->stepExecutionMock);
 
-        $this->fileIteratorMock->expects($this->once())
+        $this->flatFileIteratorMock->expects($this->once())
             ->method('current')
             ->willReturn(['first', 'second', 'third']);
 
-        $this->fileIteratorMock->expects($this->once())
+        $this->flatFileIteratorMock->expects($this->once())
             ->method('getHeaders')
             ->willReturn(['first', 'second']);
 
@@ -135,7 +135,7 @@ class ReaderTest extends TestCase
 
     public function testReadAddsMissingColumns()
     {
-        $reader = new Reader($this->fileIteratorFactoryMock);
+        $reader = new Reader($this->flatFileIteratorFactoryMock);
 
         $this->stepExecutionMock->expects($this->once())
             ->method('getJobParameters')
@@ -148,11 +148,11 @@ class ReaderTest extends TestCase
 
         $reader->setStepExecution($this->stepExecutionMock);
 
-        $this->fileIteratorMock->expects($this->once())
+        $this->flatFileIteratorMock->expects($this->once())
             ->method('current')
             ->willReturn(['first', 'second']);
 
-        $this->fileIteratorMock->expects($this->once())
+        $this->flatFileIteratorMock->expects($this->once())
             ->method('getHeaders')
             ->willReturn(['first', 'second', 'third']);
 
@@ -164,7 +164,7 @@ class ReaderTest extends TestCase
 
     public function testRead()
     {
-        $reader = new Reader($this->fileIteratorFactoryMock);
+        $reader = new Reader($this->flatFileIteratorFactoryMock);
 
         $this->stepExecutionMock->expects($this->once())
             ->method('getJobParameters')
@@ -177,11 +177,11 @@ class ReaderTest extends TestCase
 
         $reader->setStepExecution($this->stepExecutionMock);
 
-        $this->fileIteratorMock->expects($this->once())
+        $this->flatFileIteratorMock->expects($this->once())
             ->method('current')
             ->willReturn(['first', 'second']);
 
-        $this->fileIteratorMock->expects($this->once())
+        $this->flatFileIteratorMock->expects($this->once())
             ->method('getHeaders')
             ->willReturn(['first', 'second']);
 
