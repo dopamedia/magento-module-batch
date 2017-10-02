@@ -17,8 +17,10 @@ use Magento\Framework\Serialize\Serializer\Json as Serializer;
  * Class Warning
  * @package Dopamedia\Batch\Model
  */
-class Warning extends AbstractModel implements WarningInterface
+class Warning extends AbstractModel implements WarningInterface, SerializableFieldsInterface
 {
+    use SerializableFieldsTrait;
+
     /**#@+*/
     public const ID = 'id';
     public const STEP_EXECUTION_ID = 'step_execution_id';
@@ -73,6 +75,14 @@ class Warning extends AbstractModel implements WarningInterface
     protected function _construct()
     {
         $this->_init(ResourceWarning::class);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getSerializableFields(): array
+    {
+        return [self::REASON_PARAMETERS, self::ITEM];
     }
 
     /**
@@ -161,13 +171,7 @@ class Warning extends AbstractModel implements WarningInterface
      */
     public function getReasonParameters(): array
     {
-        if (is_string($this->getData(self::REASON_PARAMETERS))) {
-            return $this->serializer->unserialize($this->getData(self::REASON_PARAMETERS));
-        } elseif ($this->getData(self::REASON_PARAMETERS) === null) {
-            return [];
-        }
-
-        return is_array($this->getData(self::REASON_PARAMETERS)) ? $this->getData(self::REASON_PARAMETERS) : [];
+        return $this->getSerializedData($this->serializer, self::REASON_PARAMETERS);
     }
 
     /**
@@ -184,13 +188,7 @@ class Warning extends AbstractModel implements WarningInterface
      */
     public function getItem(): ?array
     {
-        if (is_string($this->getData(self::ITEM))) {
-            return $this->serializer->unserialize($this->getData(self::ITEM));
-        } elseif ($this->getData(self::ITEM) === null) {
-            return [];
-        }
-
-        return is_array($this->getData(self::ITEM)) ? $this->getData(self::ITEM) : [];
+        return $this->getSerializedData($this->serializer, self::ITEM);
     }
 
     /**
@@ -207,17 +205,7 @@ class Warning extends AbstractModel implements WarningInterface
      */
     public function beforeSave()
     {
-        $reasonParameters = $this->getData(self::REASON_PARAMETERS);
-
-        if (is_array($reasonParameters)) {
-            $this->setData(self::REASON_PARAMETERS, $this->serializer->serialize($reasonParameters));
-        }
-
-        $item = $this->getData(self::ITEM);
-
-        if (is_array($item)) {
-            $this->setData(self::ITEM, $this->serializer->serialize($item));
-        }
+        $this->serializeDataBeforeSave($this->serializer);
 
         return parent::beforeSave();
     }

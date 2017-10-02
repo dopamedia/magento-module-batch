@@ -22,9 +22,12 @@ use Magento\Framework\DataObject;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Model\AbstractModel;
 use Magento\Framework\Serialize\Serializer\Json as Serializer;
+use Magento\Framework\Serialize\SerializerInterface;
 
-class JobExecution extends AbstractModel implements JobExecutionInterface
+class JobExecution extends AbstractModel implements JobExecutionInterface, SerializableFieldsInterface
 {
+    use SerializableFieldsTrait;
+
     /**#@+*/
     public const ID = 'id';
     public const PID = 'pid';
@@ -120,6 +123,14 @@ class JobExecution extends AbstractModel implements JobExecutionInterface
     protected function _construct()
     {
         $this->_init(ResourceJobExecution::class);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getSerializableFields(): array
+    {
+        return [self::FAILURE_EXCEPTIONS];
     }
 
     /**
@@ -440,13 +451,7 @@ class JobExecution extends AbstractModel implements JobExecutionInterface
      */
     public function getFailureExceptions(): array
     {
-        if (is_string($this->getData(self::FAILURE_EXCEPTIONS))) {
-            return $this->serializer->unserialize($this->getData(self::FAILURE_EXCEPTIONS));
-        } elseif ($this->getData(self::FAILURE_EXCEPTIONS) === null) {
-            return [];
-        }
-
-        return is_array($this->getData(self::FAILURE_EXCEPTIONS)) ? $this->getData(self::FAILURE_EXCEPTIONS) : [];
+        return $this->getSerializedData($this->serializer, self::FAILURE_EXCEPTIONS);
     }
 
     /**
@@ -483,11 +488,7 @@ class JobExecution extends AbstractModel implements JobExecutionInterface
             $this->setData(self::STATUS, $status->getValue());
         }
 
-        $failureExceptions = $this->getData(self::FAILURE_EXCEPTIONS);
-
-        if (is_array($failureExceptions)) {
-            $this->setData(self::FAILURE_EXCEPTIONS, $this->serializer->serialize($failureExceptions));
-        }
+        $this->serializeDataBeforeSave($this->serializer);
 
         return parent::beforeSave();
     }

@@ -28,8 +28,10 @@ use Magento\Framework\Serialize\Serializer\Json as Serializer;
  * Class StepExecution
  * @package Dopamedia\Batch\Model
  */
-class StepExecution extends AbstractModel implements StepExecutionInterface
+class StepExecution extends AbstractModel implements StepExecutionInterface, SerializableFieldsInterface
 {
+    use SerializableFieldsTrait;
+
     /**#@+*/
     public const ID = 'id';
     public const STEP_NAME = 'step_name';
@@ -126,6 +128,14 @@ class StepExecution extends AbstractModel implements StepExecutionInterface
     protected function _construct()
     {
         $this->_init(ResouceStepExecution::class);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getSerializableFields(): array
+    {
+        return [self::FAILURE_EXCEPTIONS, self::ERRORS, self::SUMMARY];
     }
 
     /**
@@ -411,13 +421,7 @@ class StepExecution extends AbstractModel implements StepExecutionInterface
      */
     public function getFailureExceptions(): array
     {
-        if (is_string($this->getData(self::FAILURE_EXCEPTIONS))) {
-            return $this->serializer->unserialize($this->getData(self::FAILURE_EXCEPTIONS));
-        } elseif ($this->getData(self::FAILURE_EXCEPTIONS) === null) {
-            return [];
-        }
-
-        return is_array($this->getData(self::FAILURE_EXCEPTIONS)) ? $this->getData(self::FAILURE_EXCEPTIONS) : [];
+        return $this->getSerializedData($this->serializer,self::FAILURE_EXCEPTIONS);
     }
 
     /**
@@ -443,13 +447,7 @@ class StepExecution extends AbstractModel implements StepExecutionInterface
      */
     public function getErrors(): array
     {
-        if (is_string($this->getData(self::ERRORS))) {
-            return $this->serializer->unserialize($this->getData(self::ERRORS));
-        } elseif ($this->getData(self::ERRORS) === null) {
-            return [];
-        }
-
-        return is_array($this->getData(self::ERRORS)) ? $this->getData(self::ERRORS) : [];
+        return $this->getSerializedData($this->serializer, self::ERRORS);
     }
 
     /**
@@ -517,13 +515,7 @@ class StepExecution extends AbstractModel implements StepExecutionInterface
      */
     public function getSummary(): array
     {
-        if (is_string($this->getData(self::SUMMARY))) {
-            return $this->serializer->unserialize($this->getData(self::SUMMARY));
-        } elseif ($this->getData(self::SUMMARY) === null) {
-            return [];
-        }
-
-        return is_array($this->getData(self::SUMMARY)) ? $this->getData(self::SUMMARY) : [];
+        return $this->getSerializedData($this->serializer,self::SUMMARY);
     }
 
     /**
@@ -584,23 +576,7 @@ class StepExecution extends AbstractModel implements StepExecutionInterface
             $this->setData(self::STATUS, $status->getValue());
         }
 
-        $failureExceptions = $this->getData(self::FAILURE_EXCEPTIONS);
-
-        if (is_array($failureExceptions)) {
-            $this->setData(self::FAILURE_EXCEPTIONS, $this->serializer->serialize($failureExceptions));
-        }
-
-        $errors = $this->getData(self::ERRORS);
-
-        if (is_array($errors)) {
-            $this->setData(self::ERRORS, $this->serializer->serialize($errors));
-        }
-
-        $summary = $this->getData(self::SUMMARY);
-
-        if (is_array($summary)) {
-            $this->setData(self::SUMMARY, $this->serializer->serialize($summary));
-        }
+        $this->serializeDataBeforeSave($this->serializer);
 
         return parent::beforeSave();
     }

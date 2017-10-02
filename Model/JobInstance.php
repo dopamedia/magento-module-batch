@@ -14,9 +14,13 @@ use Dopamedia\PhpBatch\JobInstanceInterface;
 use Magento\Framework\DataObject;
 use Magento\Framework\Model\AbstractModel;
 use Magento\Framework\Serialize\Serializer\Json as Serializer;
+use Magento\Framework\Serialize\SerializerInterface;
 
-class JobInstance extends AbstractModel implements JobInstanceInterface
+class JobInstance extends AbstractModel implements JobInstanceInterface, SerializableFieldsInterface
 {
+
+    use SerializableFieldsTrait;
+
     /**#@+*/
     public const ID = 'id';
     public const CODE = 'code';
@@ -73,6 +77,14 @@ class JobInstance extends AbstractModel implements JobInstanceInterface
     protected function _construct()
     {
         $this->_init(ResourceJobInstance::class);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getSerializableFields(): array
+    {
+        return [self::RAW_PARAMETERS];
     }
 
     /**
@@ -134,13 +146,7 @@ class JobInstance extends AbstractModel implements JobInstanceInterface
      */
     public function getRawParameters(): array
     {
-        if (is_string($this->getData(self::RAW_PARAMETERS))) {
-            return $this->serializer->unserialize($this->getData(self::RAW_PARAMETERS));
-        } elseif ($this->getData(self::RAW_PARAMETERS) === null) {
-            return [];
-        }
-
-        return is_array($this->getData(self::RAW_PARAMETERS)) ? $this->getData(self::RAW_PARAMETERS) : [];
+        return $this->getSerializedData( $this->serializer, self::RAW_PARAMETERS);
     }
 
     /**
@@ -201,11 +207,7 @@ class JobInstance extends AbstractModel implements JobInstanceInterface
      */
     public function beforeSave()
     {
-        $rawParameters = $this->getData(self::RAW_PARAMETERS);
-
-        if (is_array($rawParameters)) {
-            $this->setData(self::RAW_PARAMETERS, $this->serializer->serialize($rawParameters));
-        }
+        $this->serializeDataBeforeSave($this->serializer);
 
         return parent::beforeSave();
     }
