@@ -23,5 +23,5 @@ interface HeaderProviderInterface
     /**
      * @return bool
      */
-    public function processFirstRow(): bool;
+    public function doProcessFirstRow(): bool;
 }

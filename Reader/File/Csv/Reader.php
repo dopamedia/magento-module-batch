@@ -13,6 +13,7 @@ use Dopamedia\PhpBatch\Item\FileInvalidItem;
 use Dopamedia\PhpBatch\Item\FlushableInterface;
 use Dopamedia\PhpBatch\Item\InvalidItemException;
 use Dopamedia\PhpBatch\Item\ItemReaderInterface;
+use Dopamedia\PhpBatch\Job\JobParameters;
 use Dopamedia\PhpBatch\Step\StepExecutionAwareInterface;
 use Dopamedia\PhpBatch\Step\StepExecutionAwareTrait;
 
@@ -67,30 +68,15 @@ class Reader implements ItemReaderInterface, StepExecutionAwareInterface, Flusha
     public function read()
     {
         $jobParameters = $this->stepExecution->getJobParameters();
-        $filePath = $jobParameters->get('filePath');
 
         if ($this->fileIterator === null) {
-            $delimiter = $jobParameters->get('delimiter');
-            $enclosure = $jobParameters->get('enclosure');
-            $defaultOptions = [
-                'reader_options' => [
-                    'fieldDelimiter' => $delimiter,
-                    'fieldEnclosure' => $enclosure,
-                ],
-            ];
-
-            /** @var FileIteratorInterface fileIterator */
-            $this->fileIterator = $this->fileIteratorFactory->create([
-                'type' => 'csv',
-                'filePath' => $filePath,
-                'headerProvider' => $this->headerProvider,
-                'options' => array_merge($defaultOptions, $this->options)
-            ]);
-
+            $this->fileIterator = $this->createFileIterator($jobParameters);
             $this->fileIterator->rewind();
         }
 
-        $this->fileIterator->next();
+        if ($this->headerProvider->doProcessFirstRow() !== true) {
+            $this->fileIterator->next();
+        }
 
         if ($this->fileIterator->valid() === true) {
             $this->stepExecution->incrementSummaryInfo('item_position');
@@ -107,7 +93,7 @@ class Reader implements ItemReaderInterface, StepExecutionAwareInterface, Flusha
         $countHeaders = count($headers);
         $countData = count($data);
 
-        $this->checkColumnNumber($countHeaders, $countData, $data, $filePath);
+        $this->checkColumnNumber($countHeaders, $countData, $data, $jobParameters->get('filePath'));
 
         if ($countHeaders > $countData) {
             $missingValuesCount = $countHeaders - $countData;
@@ -115,7 +101,32 @@ class Reader implements ItemReaderInterface, StepExecutionAwareInterface, Flusha
             $data = array_merge($data, $missingValues);
         }
 
+        if ($this->headerProvider->doProcessFirstRow() === true) {
+            $this->fileIterator->next();
+        }
+
         return array_combine($headers, $data);
+    }
+
+    /**
+     * @param JobParameters $jobParameters
+     * @return FileIteratorInterface
+     */
+    private function createFileIterator(JobParameters $jobParameters): FileIteratorInterface
+    {
+        $defaultOptions = [
+            'reader_options' => [
+                'fieldDelimiter' => $jobParameters->get('delimiter'),
+                'fieldEnclosure' => $jobParameters->get('enclosure'),
+            ],
+        ];
+
+        return $this->fileIteratorFactory->create([
+            'type' => 'csv',
+            'filePath' => $jobParameters->get('filePath'),
+            'headerProvider' => $this->headerProvider,
+            'options' => array_merge($defaultOptions, $this->options)
+        ]);
     }
 
     /**

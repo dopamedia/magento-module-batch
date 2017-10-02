@@ -26,7 +26,7 @@ class NumericHeaderProvider implements HeaderProviderInterface
      * @inheritDoc
      * @codeCoverageIgnore
      */
-    public function processFirstRow(): bool
+    public function doProcessFirstRow(): bool
     {
         return true;
     }

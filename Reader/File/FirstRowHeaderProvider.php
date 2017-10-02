@@ -26,7 +26,7 @@ class FirstRowHeaderProvider implements HeaderProviderInterface
      * @return bool
      * @codeCoverageIgnore
      */
-    public function processFirstRow(): bool
+    public function doProcessFirstRow(): bool
     {
         return false;
     }
