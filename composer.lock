@@ -446,12 +446,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/dopamedia/php-batch.git",
-                "reference": "3b1f124f823ca003d68841040ca6ae799f443c28"
+                "reference": "591b8b15692e20a1db7e2a8d2f6a4780590e860d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/dopamedia/php-batch/zipball/3b1f124f823ca003d68841040ca6ae799f443c28",
-                "reference": "3b1f124f823ca003d68841040ca6ae799f443c28",
+                "url": "https://api.github.com/repos/dopamedia/php-batch/zipball/591b8b15692e20a1db7e2a8d2f6a4780590e860d",
+                "reference": "591b8b15692e20a1db7e2a8d2f6a4780590e860d",
                 "shasum": ""
             },
             "require": {
@@ -478,7 +478,7 @@
                 }
             ],
             "description": "N/A",
-            "time": "2017-10-02 12:59:11"
+            "time": "2017-10-03 06:46:47"
         },
         {
             "name": "firegento/fastsimpleimport",
@@ -522,16 +522,16 @@
         },
         {
             "name": "justinrainbow/json-schema",
-            "version": "5.2.1",
+            "version": "5.2.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/justinrainbow/json-schema.git",
-                "reference": "429be236f296ca249d61c65649cdf2652f4a5e80"
+                "reference": "b80053b620826810b38211b3c5f935ba9cddf6b3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/justinrainbow/json-schema/zipball/429be236f296ca249d61c65649cdf2652f4a5e80",
-                "reference": "429be236f296ca249d61c65649cdf2652f4a5e80",
+                "url": "https://api.github.com/repos/justinrainbow/json-schema/zipball/b80053b620826810b38211b3c5f935ba9cddf6b3",
+                "reference": "b80053b620826810b38211b3c5f935ba9cddf6b3",
                 "shasum": ""
             },
             "require": {
@@ -540,7 +540,6 @@
             "require-dev": {
                 "friendsofphp/php-cs-fixer": "^2.1",
                 "json-schema/json-schema-test-suite": "1.2.0",
-                "phpdocumentor/phpdocumentor": "^2.7",
                 "phpunit/phpunit": "^4.8.22"
             },
             "bin": [
@@ -585,7 +584,7 @@
                 "json",
                 "schema"
             ],
-            "time": "2017-05-16T21:06:09+00:00"
+            "time": "2017-10-03T00:49:49+00:00"
         },
         {
             "name": "magento/framework",

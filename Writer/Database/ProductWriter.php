@@ -73,7 +73,11 @@ class ProductWriter extends AbstractWriter implements ItemWriterInterface
             $this->incrementCount($item);
         }
 
-        $this->state->setAreaCode(FrontNameResolver::AREA_CODE);
+        try {
+            $this->state->setAreaCode(FrontNameResolver::AREA_CODE);
+        } catch (\Exception $e) {
+            // noop
+        }
 
         $this->createImporter()->processImport($items);
     }
