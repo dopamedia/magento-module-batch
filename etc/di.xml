@@ -26,8 +26,9 @@
     <type name="Magento\Framework\Console\CommandListInterface">
         <arguments>
             <argument name="commands" xsi:type="array">
-                <item name="batchJobCreateCommand" xsi:type="object">Dopamedia\Batch\Console\Command\BatchJobCreateCommand</item>
-                <item name="batchJobInstanceListCommand" xsi:type="object">Dopamedia\Batch\Console\Command\BatchJobInstanceListCommand</item>
+                <item name="batchJobCreateCommand" xsi:type="object">Dopamedia\Batch\Console\Command\JobCreateCommand</item>
+                <item name="batchJobInstanceListCommand" xsi:type="object">Dopamedia\Batch\Console\Command\JobInstanceListCommand</item>
+                <item name="batchJobExecuteCommand" xsi:type="object">Dopamedia\Batch\Console\Command\JobExecuteCommand</item>
             </argument>
         </arguments>
     </type>

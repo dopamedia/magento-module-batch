@@ -21,10 +21,10 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Magento\Framework\Console\Cli;
 
 /**
- * Class BatchJobCreateCommand
+ * Class JobCreateCommand
  * @package Dopamedia\Batch\Console\Command
  */
-class BatchJobCreateCommand extends Command
+class JobCreateCommand extends Command
 {
     private const ARGUMENT_NAME_JOB = 'job';
     private const ARGUMENT_NAME_CODE = 'code';

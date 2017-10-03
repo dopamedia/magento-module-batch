@@ -6,22 +6,21 @@
 
 namespace Dopamedia\Batch\Test\Unit\Console\Command;
 
-use Dopamedia\Batch\Console\Command\BatchJobInstanceListCommand;
+use Dopamedia\Batch\Console\Command\JobInstanceListCommand;
 use Dopamedia\Batch\Model\JobInstance;
 use Dopamedia\Batch\Model\ResourceModel\JobInstance\Collection as JobInstanceCollection;
 use Magento\Framework\Console\Cli;
 use Symfony\Component\Console\Helper\TableFactory;
 use Symfony\Component\Console\Helper\Table;
-use Magento\Framework\TestFramework\Unit\Helper\ObjectManager;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 
 /**
- * Class BatchJobInstanceListCommandTest
+ * Class JobInstanceListCommandTest
  * @package Dopamedia\Batch\Test\Unit\Console\Command
  * @group current
  */
-class BatchJobInstanceListCommandTest extends TestCase
+class JobInstanceListCommandTest extends TestCase
 {
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject|JobInstanceCollection
@@ -39,7 +38,7 @@ class BatchJobInstanceListCommandTest extends TestCase
     protected $tableMock;
 
     /**
-     * @var BatchJobInstanceListCommand
+     * @var JobInstanceListCommand
      */
     protected $command;
 
@@ -54,7 +53,7 @@ class BatchJobInstanceListCommandTest extends TestCase
 
         $this->tableMock = $this->createMock(Table::class);
 
-        $this->command = new BatchJobInstanceListCommand(
+        $this->command = new JobInstanceListCommand(
             $this->jobInstanceCollectionMock,
             $this->tableFactoryMock
         );

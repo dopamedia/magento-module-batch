@@ -7,7 +7,7 @@
 namespace Dopamedia\Batch\Test\Unit\Console\Command;
 
 use Dopamedia\Batch\Api\JobInstanceRepositoryInterface;
-use Dopamedia\Batch\Console\Command\BatchJobCreateCommand;
+use Dopamedia\Batch\Console\Command\JobCreateCommand;
 use Dopamedia\PhpBatch\Job\JobParameters;
 use Dopamedia\PhpBatch\Job\JobParametersFactory;
 use Dopamedia\PhpBatch\Job\JobRegistryInterface;
@@ -21,7 +21,7 @@ use Magento\Framework\Phrase;
 use Symfony\Component\Console\Tester\CommandTester;
 use PHPUnit\Framework\TestCase;
 
-class BatchJobCreateCommandTest extends TestCase
+class JobCreateCommandTest extends TestCase
 {
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject|JobInstanceInterfaceFactory
@@ -59,7 +59,7 @@ class BatchJobCreateCommandTest extends TestCase
     protected $jobParametersMock;
 
     /**
-     * @var BatchJobCreateCommand
+     * @var JobCreateCommand
      */
     protected $command;
 
@@ -82,7 +82,7 @@ class BatchJobCreateCommandTest extends TestCase
 
         $this->jobParametersMock = $this->createMock(JobParameters::class);
 
-        $this->command = new BatchJobCreateCommand(
+        $this->command = new JobCreateCommand(
             $this->jobInstanceFactoryMock,
             $this->jobRegistryMock,
             $this->jobInstanceRepositoryMock,

@@ -16,10 +16,10 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Class BatchJobInstanceListCommand
+ * Class JobInstanceListCommand
  * @package Dopamedia\Batch\Console\Command
  */
-class BatchJobInstanceListCommand extends Command
+class JobInstanceListCommand extends Command
 {
     /**
      * @var JobInstanceCollection
