@@ -27,6 +27,7 @@
         <arguments>
             <argument name="commands" xsi:type="array">
                 <item name="batchJobCreateCommand" xsi:type="object">Dopamedia\Batch\Console\Command\BatchJobCreateCommand</item>
+                <item name="batchJobInstanceListCommand" xsi:type="object">Dopamedia\Batch\Console\Command\BatchJobInstanceListCommand</item>
             </argument>
         </arguments>
     </type>
