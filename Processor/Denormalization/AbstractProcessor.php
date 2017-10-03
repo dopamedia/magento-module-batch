@@ -7,6 +7,7 @@
 namespace Dopamedia\Batch\Processor\Denormalization;
 
 use Dopamedia\PhpBatch\Item\FileInvalidItem;
+use Dopamedia\PhpBatch\Item\FileInvalidItemFactory;
 use Dopamedia\PhpBatch\Item\InvalidItemException;
 use Dopamedia\PhpBatch\Step\StepExecutionAwareInterface;
 use Dopamedia\PhpBatch\Step\StepExecutionAwareTrait;
@@ -20,6 +21,20 @@ abstract class AbstractProcessor implements StepExecutionAwareInterface
     use StepExecutionAwareTrait;
 
     /**
+     * @var FileInvalidItemFactory
+     */
+    private $fileInvalidItemFactory;
+
+    /**
+     * AbstractProcessor constructor.
+     * @param FileInvalidItemFactory $fileInvalidItemFactory
+     */
+    public function __construct(FileInvalidItemFactory $fileInvalidItemFactory)
+    {
+        $this->fileInvalidItemFactory = $fileInvalidItemFactory;
+    }
+
+    /**
      * @param array $item
      * @param string $message
      * @param \Exception|null $previousException
@@ -29,10 +44,11 @@ abstract class AbstractProcessor implements StepExecutionAwareInterface
     {
         $this->stepExecution->incrementSummaryInfo('skip');
 
-        $invalidItem = new FileInvalidItem(
-            $item,
-            ($this->stepExecution->getSummaryInfo('item_position'))
-        );
+        /** @var FileInvalidItem $invalidItem */
+        $invalidItem = $this->fileInvalidItemFactory->create([
+            'invalidData' => $item,
+            'itemPosition' => $this->stepExecution->getSummaryInfo('item_position')
+        ]);
 
         throw new InvalidItemException($message, $invalidItem, [], 0, $previousException);
     }
