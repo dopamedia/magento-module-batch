@@ -26,7 +26,7 @@ class DefaultValuesProviderRegistry implements DefaultValuesProviderRegistryInte
      * DefaultValuesProviderRegistry constructor.
      * @param DefaultValuesProviderInterface[] $defaultValuesProviders
      */
-    public function __construct(array $defaultValuesProviders)
+    public function __construct(array $defaultValuesProviders = [])
     {
         $this->defaultValuesProviders = $defaultValuesProviders;
     }

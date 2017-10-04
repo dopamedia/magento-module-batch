@@ -26,7 +26,7 @@ class ValidatorProviderRegistry implements JobParameters\ValidatorProviderRegist
      * ValidatorProviderRegistry constructor.
      * @param array $validatorProviders
      */
-    public function __construct(array $validatorProviders)
+    public function __construct(array $validatorProviders = [])
     {
         $this->validatorProviders = $validatorProviders;
     }
