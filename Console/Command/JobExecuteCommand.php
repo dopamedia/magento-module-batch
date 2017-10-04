@@ -8,6 +8,7 @@ namespace Dopamedia\Batch\Console\Command;
 
 use Dopamedia\Batch\Api\JobInstanceRepositoryInterface;
 use Dopamedia\PhpBatch\ExitStatus;
+use Dopamedia\PhpBatch\Job\JobParametersValidator;
 use Dopamedia\PhpBatch\Job\JobRegistryInterface;
 use Dopamedia\PhpBatch\Job\JobParametersFactory;
 use Dopamedia\PhpBatch\Repository\JobRepositoryInterface;
@@ -17,6 +18,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Magento\Framework\Console\Cli;
+use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 /**
  * Class JobExecuteCommand
@@ -49,23 +51,31 @@ class JobExecuteCommand extends Command
     private $jobParametersFactory;
 
     /**
-     * BatchJobExecuteCommand constructor.
+     * @var JobParametersValidator
+     */
+    private $jobParametersValidator;
+
+    /**
+     * JobExecuteCommand constructor.
      * @param JobInstanceRepositoryInterface $jobInstanceRepository
      * @param JobRegistryInterface $jobRegistry
      * @param JobRepositoryInterface $jobRepository
      * @param JobParametersFactory $jobParametersFactory
+     * @param JobParametersValidator $jobParametersValidator
      */
     public function __construct(
         JobInstanceRepositoryInterface $jobInstanceRepository,
         JobRegistryInterface $jobRegistry,
         JobRepositoryInterface $jobRepository,
-        JobParametersFactory $jobParametersFactory
+        JobParametersFactory $jobParametersFactory,
+        JobParametersValidator $jobParametersValidator
     )
     {
         $this->jobInstanceRepository = $jobInstanceRepository;
         $this->jobRegistry = $jobRegistry;
         $this->jobRepository = $jobRepository;
         $this->jobParametersFactory = $jobParametersFactory;
+        $this->jobParametersValidator = $jobParametersValidator;
         parent::__construct();
     }
 
@@ -108,6 +118,20 @@ class JobExecuteCommand extends Command
         }
 
         $jobParameters = $this->jobParametersFactory->create($job, $rawParameters);
+        $validationErrors = $this->jobParametersValidator->validate($job, $jobParameters);
+
+        if (count($validationErrors) > 0) {
+            throw new \RuntimeException(
+                sprintf(
+                    'Job instance "%s" running the job "%s" with parameters "%s" is invalid because of "%s"',
+                    $code,
+                    $job->getName(),
+                    print_r($jobParameters->all(), true),
+                    $this->getValidationErrorMessages($validationErrors)
+                )
+            );
+        }
+
         $jobExecution = $this->jobRepository->createJobExecution($jobInstance, $jobParameters);
         $jobExecution->setJobInstance($jobInstance);
         $jobExecution->setPid(getmygid());
@@ -184,6 +208,21 @@ class JobExecuteCommand extends Command
                 $output->write(sprintf('<error>%s</error>', $exception['trace']), true);
             }
         }
+    }
+
+    /**
+     * @param array $validationErrors
+     * @return string
+     */
+    private function getValidationErrorMessages(array $validationErrors): string
+    {
+        $violationErrorsStr = '';
+
+        foreach ($validationErrors as $validationError) {
+            $violationErrorsStr .= sprintf("\n  - %s", $validationError);
+        }
+
+        return $violationErrorsStr;
     }
 
     /**
