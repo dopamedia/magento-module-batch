@@ -4,7 +4,7 @@
  * Date: 28.09.17
  */
 
-namespace Dopamedia\Batch\Model;
+namespace Dopamedia\Batch\Job;
 
 use Dopamedia\PhpBatch\Job\JobRegistryInterface;
 use Dopamedia\PhpBatch\JobInterface;
@@ -13,7 +13,7 @@ use Magento\Framework\Phrase;
 
 /**
  * Class JobRegistry
- * @package Dopamedia\Batch\Model
+ * @package Dopamedia\Batch\Job
  */
 class JobRegistry implements JobRegistryInterface
 {

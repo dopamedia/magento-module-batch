@@ -4,9 +4,9 @@
  * Date: 28.09.17
  */
 
-namespace Dopamedia\Batch\Test\Unit\Model;
+namespace Dopamedia\Batch\Test\Unit\Job;
 
-use Dopamedia\Batch\Model\JobRegistry;
+use Dopamedia\Batch\Job\JobRegistry;
 use Dopamedia\PhpBatch\Job\UndefinedJobException;
 use Dopamedia\PhpBatch\JobInterface;
 use PHPUnit\Framework\TestCase;

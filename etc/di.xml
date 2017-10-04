@@ -9,7 +9,8 @@
     <preference for="Dopamedia\PhpBatch\WarningInterface" type="Dopamedia\Batch\Model\Warning" />
     <preference for="Dopamedia\Batch\Api\WarningRepositoryInterface" type="Dopamedia\Batch\Model\WarningRepository" />
     <preference for="Dopamedia\PhpBatch\Repository\JobRepositoryInterface" type="Dopamedia\Batch\Model\JobRepository" />
-    <preference for="Dopamedia\PhpBatch\Job\JobRegistryInterface" type="Dopamedia\Batch\Model\JobRegistry" />
+    <preference for="Dopamedia\PhpBatch\Job\JobRegistryInterface" type="Dopamedia\Batch\Job\JobRegistry" />
+    <preference for="Dopamedia\PhpBatch\Job\JobParameters\DefaultValuesProviderRegistryInterface" type="Dopamedia\Batch\Job\JobParameters\DefaultValuesProviderRegistry" />
     <preference for="Dopamedia\PhpBatch\Adapter\EventManagerAdapterInterface" type="Dopamedia\Batch\Adapter\EventManagerAdapter" />
     <preference for="Dopamedia\PhpBatch\Item\ItemReaderInterface" type="Dopamedia\Batch\Reader\NoopReader" />
     <preference for="Dopamedia\PhpBatch\Item\ItemProcessorInterface" type="Dopamedia\Batch\Processor\NoopProcessor" />
