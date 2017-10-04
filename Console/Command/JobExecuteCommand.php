@@ -8,6 +8,7 @@ namespace Dopamedia\Batch\Console\Command;
 
 use Dopamedia\Batch\Api\JobInstanceRepositoryInterface;
 use Dopamedia\PhpBatch\ExitStatus;
+use Dopamedia\PhpBatch\Job\JobParameters\ValidatorProviderResult;
 use Dopamedia\PhpBatch\Job\JobParametersValidator;
 use Dopamedia\PhpBatch\Job\JobRegistryInterface;
 use Dopamedia\PhpBatch\Job\JobParametersFactory;
@@ -118,16 +119,16 @@ class JobExecuteCommand extends Command
         }
 
         $jobParameters = $this->jobParametersFactory->create($job, $rawParameters);
-        $validationErrors = $this->jobParametersValidator->validate($job, $jobParameters);
+        $validationErrorMessages = $this->jobParametersValidator->validate($job, $jobParameters);
 
-        if (count($validationErrors) > 0) {
+        if ($validationErrorMessages->hasMessages() === true) {
             throw new \RuntimeException(
                 sprintf(
                     'Job instance "%s" running the job "%s" with parameters "%s" is invalid because of "%s"',
                     $code,
                     $job->getName(),
                     print_r($jobParameters->all(), true),
-                    $this->getValidationErrorMessages($validationErrors)
+                    $validationErrorMessages->__toString()
                 )
             );
         }
@@ -208,21 +209,6 @@ class JobExecuteCommand extends Command
                 $output->write(sprintf('<error>%s</error>', $exception['trace']), true);
             }
         }
-    }
-
-    /**
-     * @param array $validationErrors
-     * @return string
-     */
-    private function getValidationErrorMessages(array $validationErrors): string
-    {
-        $violationErrorsStr = '';
-
-        foreach ($validationErrors as $validationError) {
-            $violationErrorsStr .= sprintf("\n  - %s", $validationError);
-        }
-
-        return $violationErrorsStr;
     }
 
     /**
