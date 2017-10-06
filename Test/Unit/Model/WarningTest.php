@@ -8,6 +8,7 @@ namespace Dopamedia\Batch\Test\Unit\Model;
 
 use Dopamedia\Batch\Api\StepExecutionRepositoryInterface;
 use Dopamedia\Batch\Model\Warning;
+use Dopamedia\PhpBatch\Repository\JobRepositoryInterface;
 use Dopamedia\PhpBatch\StepExecutionInterface;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Phrase;
@@ -18,9 +19,9 @@ use PHPUnit\Framework\TestCase;
 class WarningTest extends TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|StepExecutionRepositoryInterface
+     * @var \PHPUnit_Framework_MockObject_MockObject|JobRepositoryInterface
      */
-    protected $stepExecutionRepositoryMock;
+    protected $jobRepository;
 
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject|StepExecutionInterface
@@ -40,7 +41,7 @@ class WarningTest extends TestCase
 
     protected function setUp()
     {
-        $this->stepExecutionRepositoryMock = $this->createMock(StepExecutionRepositoryInterface::class);
+        $this->jobRepository = $this->createMock(JobRepositoryInterface::class);
         $this->stepExecutionMock = $this->createMock(StepExecutionInterface::class);
         $this->serializerMock = $this->createMock(Serializer::class);
         $this->objectManager = new ObjectManager($this);
@@ -54,7 +55,7 @@ class WarningTest extends TestCase
         return $this->objectManager->getObject(
             Warning::class,
             [
-                'stepExecutionRepository' => $this->stepExecutionRepositoryMock,
+                'jobRepository' => $this->jobRepository,
                 'serializer' => $this->serializerMock
             ]
         );
@@ -70,8 +71,8 @@ class WarningTest extends TestCase
 
     public function testGetStepExecutionWithNoSuchEntityException()
     {
-        $this->stepExecutionRepositoryMock->expects($this->once())
-            ->method('getById')
+        $this->jobRepository->expects($this->once())
+            ->method('getStepExecutionById')
             ->with(11)
             ->willThrowException(new NoSuchEntityException(new Phrase('')));
 
@@ -85,8 +86,8 @@ class WarningTest extends TestCase
 
     public function testGetStepExecution()
     {
-        $this->stepExecutionRepositoryMock->expects($this->once())
-            ->method('getById')
+        $this->jobRepository->expects($this->once())
+            ->method('getStepExecutionById')
             ->with(11)
             ->willReturn($this->stepExecutionMock);
 

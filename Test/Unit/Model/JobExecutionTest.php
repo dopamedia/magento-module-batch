@@ -6,7 +6,6 @@
 
 namespace Dopamedia\Batch\Test\Unit\Model;
 
-use Dopamedia\Batch\Api\JobInstanceRepositoryInterface;
 use Dopamedia\Batch\Model\JobExecution;
 use Dopamedia\Batch\Model\StepExecution;
 use Dopamedia\Batch\Model\ResourceModel\StepExecution\CollectionFactory as StepExecutionCollectionFactory;
@@ -16,6 +15,7 @@ use Dopamedia\PhpBatch\BatchStatus;
 use Dopamedia\PhpBatch\ExitStatus;
 use Dopamedia\PhpBatch\JobInstanceInterface;
 use Dopamedia\PhpBatch\Job\RuntimeErrorException;
+use Dopamedia\PhpBatch\Repository\JobRepositoryInterface;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Phrase;
 use Magento\Framework\Serialize\Serializer\Json as Serializer;
@@ -25,9 +25,9 @@ use PHPUnit\Framework\TestCase;
 class JobExecutionTest extends TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|JobInstanceRepositoryInterface
+     * @var \PHPUnit_Framework_MockObject_MockObject|JobRepositoryInterface
      */
-    protected $jobInstanceRepositoryMock;
+    protected $jobRepositoryMock;
 
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject|JobInstanceInterface
@@ -66,7 +66,7 @@ class JobExecutionTest extends TestCase
 
     protected function setUp()
     {
-        $this->jobInstanceRepositoryMock = $this->createMock(JobInstanceRepositoryInterface::class);
+        $this->jobRepositoryMock = $this->createMock(JobRepositoryInterface::class);
         $this->jobInstanceMock = $this->createMock(JobInstanceInterface::class);
         $this->serializerMock = $this->createMock(Serializer::class);
         $this->stepExecutionFactoryMock = $this->getMockBuilder(StepExecutionFactory::class)
@@ -94,7 +94,7 @@ class JobExecutionTest extends TestCase
         return $this->objectManager->getObject(
             JobExecution::class,
             [
-                'jobInstanceRepository' => $this->jobInstanceRepositoryMock,
+                'jobRepository' => $this->jobRepositoryMock,
                 'serializer' => $this->serializerMock,
                 'stepExecutionFactory' => $this->stepExecutionFactoryMock,
                 'stepExecutionCollectionFactory' => $this->stepExecutionCollectionFactoryMock
@@ -112,8 +112,8 @@ class JobExecutionTest extends TestCase
 
     public function testGetJobInstanceWithNoSuchEntityException()
     {
-        $this->jobInstanceRepositoryMock->expects($this->once())
-            ->method('getById')
+        $this->jobRepositoryMock->expects($this->once())
+            ->method('getJobInstanceById')
             ->with(11)
             ->willThrowException(new NoSuchEntityException(new Phrase('')));
 
@@ -128,8 +128,8 @@ class JobExecutionTest extends TestCase
 
     public function testGetJobInstance()
     {
-        $this->jobInstanceRepositoryMock->expects($this->once())
-            ->method('getById')
+        $this->jobRepositoryMock->expects($this->once())
+            ->method('getJobInstanceById')
             ->with(11)
             ->willReturn($this->jobInstanceMock);
 

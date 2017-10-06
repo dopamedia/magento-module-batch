@@ -6,7 +6,6 @@
 
 namespace Dopamedia\Batch\Model;
 
-use Dopamedia\Batch\Api\JobExecutionRepositoryInterface;
 use Dopamedia\Batch\Model\ResourceModel\StepExecution as ResouceStepExecution;
 use Dopamedia\PhpBatch\BatchStatus;
 use Dopamedia\PhpBatch\ExitStatus;
@@ -15,6 +14,7 @@ use Dopamedia\PhpBatch\Item\InvalidItemInterface;
 use Dopamedia\PhpBatch\Job\RuntimeErrorException;
 use Dopamedia\PhpBatch\JobExecutionInterface;
 use Dopamedia\PhpBatch\Job\JobParameters;
+use Dopamedia\PhpBatch\Repository\JobRepositoryInterface;
 use Dopamedia\PhpBatch\StepExecutionInterface;
 use Dopamedia\Batch\Model\ResourceModel\Warning\Collection as WarningCollection;
 use Dopamedia\Batch\Model\ResourceModel\Warning\CollectionFactory as WarningCollectionFactory;
@@ -51,9 +51,9 @@ class StepExecution extends AbstractModel implements StepExecutionInterface, Ser
     /**#@-*/
 
     /**
-     * @var JobExecutionRepositoryInterface
+     * @var JobRepositoryInterface
      */
-    private $jobExecutionRepository;
+    private $jobRepository;
 
     /**
      * @var null|JobExecutionInterface
@@ -94,7 +94,7 @@ class StepExecution extends AbstractModel implements StepExecutionInterface, Ser
      * StepExecution constructor.
      * @param \Magento\Framework\Model\Context $context
      * @param \Magento\Framework\Registry $registry
-     * @param JobExecutionRepositoryInterface $jobExecutionRepository
+     * @param JobRepositoryInterface $jobRepository
      * @param Serializer $serializer
      * @param WarningCollectionFactory $warningCollectionFactory
      * @param WarningFactory $warningFactory
@@ -105,7 +105,7 @@ class StepExecution extends AbstractModel implements StepExecutionInterface, Ser
     public function __construct(
         \Magento\Framework\Model\Context $context,
         \Magento\Framework\Registry $registry,
-        JobExecutionRepositoryInterface $jobExecutionRepository,
+        JobRepositoryInterface $jobRepository,
         Serializer $serializer,
         WarningCollectionFactory $warningCollectionFactory,
         WarningFactory $warningFactory,
@@ -115,7 +115,7 @@ class StepExecution extends AbstractModel implements StepExecutionInterface, Ser
     )
     {
         parent::__construct($context, $registry, $resource, $resourceCollection, $data);
-        $this->jobExecutionRepository = $jobExecutionRepository;
+        $this->jobRepository = $jobRepository;
         $this->serializer = $serializer;
         $this->warningCollectionFactory = $warningCollectionFactory;
         $this->warningFactory = $warningFactory;
@@ -195,12 +195,12 @@ class StepExecution extends AbstractModel implements StepExecutionInterface, Ser
 
     /**
      * @return JobExecutionInterface|null
-     * @throws NoSuchEntityException
+     * @throws \Exception
      */
     public function getJobExecution(): ?JobExecutionInterface
     {
         if ($this->jobExecution === null && $this->getJobExecutionId() !== null) {
-            $this->jobExecution = $this->jobExecutionRepository->getById($this->getJobExecutionId());
+            $this->jobExecution = $this->jobRepository->getJobExecutionById($this->getJobExecutionId());
         }
 
         return $this->jobExecution;
@@ -409,7 +409,7 @@ class StepExecution extends AbstractModel implements StepExecutionInterface, Ser
 
     /**
      * @return JobParameters
-     * @throws NoSuchEntityException
+     * @throws \Exception
      */
     public function getJobParameters(): JobParameters
     {

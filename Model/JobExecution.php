@@ -6,7 +6,6 @@
 
 namespace Dopamedia\Batch\Model;
 
-use Dopamedia\Batch\Api\JobInstanceRepositoryInterface;
 use Dopamedia\Batch\Model\ResourceModel\JobExecution as ResourceJobExecution;
 use Dopamedia\Batch\Model\ResourceModel\StepExecution\Collection as StepExecutionCollection;
 use Dopamedia\Batch\Model\ResourceModel\StepExecution\CollectionFactory as StepExecutionCollectionFactory;
@@ -17,13 +16,17 @@ use Dopamedia\PhpBatch\Job\RuntimeErrorException;
 use Dopamedia\PhpBatch\JobExecutionInterface;
 use Dopamedia\PhpBatch\JobInstanceInterface;
 use Dopamedia\PhpBatch\Job\JobParameters;
+use Dopamedia\PhpBatch\Repository\JobRepositoryInterface;
 use Dopamedia\PhpBatch\StepExecutionInterface;
 use Magento\Framework\DataObject;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Model\AbstractModel;
 use Magento\Framework\Serialize\Serializer\Json as Serializer;
-use Magento\Framework\Serialize\SerializerInterface;
 
+/**
+ * Class JobExecution
+ * @package Dopamedia\Batch\Model
+ */
 class JobExecution extends AbstractModel implements JobExecutionInterface, SerializableFieldsInterface
 {
     use SerializableFieldsTrait;
@@ -43,9 +46,9 @@ class JobExecution extends AbstractModel implements JobExecutionInterface, Seria
     /**#@-*/
 
     /**
-     * @var JobInstanceRepositoryInterface
+     * @var JobRepositoryInterface
      */
-    private $jobInstanceRepository;
+    private $jobRepository;
 
     /**
      * @var Serializer
@@ -91,9 +94,10 @@ class JobExecution extends AbstractModel implements JobExecutionInterface, Seria
      * JobExecution constructor.
      * @param \Magento\Framework\Model\Context $context
      * @param \Magento\Framework\Registry $registry
-     * @param JobInstanceRepositoryInterface $jobInstanceRepository
+     * @param JobRepositoryInterface $jobRepository
      * @param Serializer $serializer
      * @param StepExecutionFactory $stepExecutionFactory
+     * @param StepExecutionCollectionFactory $stepExecutionCollectionFactory
      * @param \Magento\Framework\Model\ResourceModel\AbstractResource|null $resource
      * @param \Magento\Framework\Data\Collection\AbstractDb|null $resourceCollection
      * @param array $data
@@ -101,7 +105,7 @@ class JobExecution extends AbstractModel implements JobExecutionInterface, Seria
     public function __construct(
         \Magento\Framework\Model\Context $context,
         \Magento\Framework\Registry $registry,
-        JobInstanceRepositoryInterface $jobInstanceRepository,
+        JobRepositoryInterface $jobRepository,
         Serializer $serializer,
         StepExecutionFactory $stepExecutionFactory,
         StepExecutionCollectionFactory $stepExecutionCollectionFactory,
@@ -110,7 +114,7 @@ class JobExecution extends AbstractModel implements JobExecutionInterface, Seria
         array $data = []
     ){
         parent::__construct($context, $registry, $resource, $resourceCollection, $data);
-        $this->jobInstanceRepository = $jobInstanceRepository;
+        $this->jobRepository = $jobRepository;
         $this->serializer = $serializer;
         $this->stepExecutionFactory = $stepExecutionFactory;
         $this->stepExecutionCollectionFactory = $stepExecutionCollectionFactory;
@@ -173,7 +177,7 @@ class JobExecution extends AbstractModel implements JobExecutionInterface, Seria
 
     /**
      * @return JobInstanceInterface|null
-     * @throws NoSuchEntityException
+     * @throws \Exception
      */
     public function getJobInstance(): ?JobInstanceInterface
     {
@@ -182,7 +186,7 @@ class JobExecution extends AbstractModel implements JobExecutionInterface, Seria
         }
 
         if ($this->jobInstance === null) {
-            $this->jobInstance = $this->jobInstanceRepository->getById($this->getJobInstanceId());
+            $this->jobInstance = $this->jobRepository->getJobInstanceById($this->getJobInstanceId());
         }
 
         return $this->jobInstance;

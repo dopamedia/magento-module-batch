@@ -6,19 +6,20 @@
 
 namespace Dopamedia\Batch\Model;
 
-use Dopamedia\Batch\Api\JobExecutionRepositoryInterface;
-use Dopamedia\Batch\Api\JobInstanceRepositoryInterface;
-use Dopamedia\Batch\Api\StepExecutionRepositoryInterface;
-use Dopamedia\Batch\Api\WarningRepositoryInterface;
 use Dopamedia\PhpBatch\Job\JobParameters;
-use Dopamedia\PhpBatch\JobExecutionInterfaceFactory;
 use Dopamedia\PhpBatch\JobExecutionInterface;
 use Dopamedia\PhpBatch\JobInstanceInterface;
 use Dopamedia\PhpBatch\Repository\JobRepositoryInterface;
 use Dopamedia\PhpBatch\StepExecutionInterface;
 use Dopamedia\PhpBatch\WarningInterface;
-use Dopamedia\PhpBatch\WarningInterfaceFactory;
+use Dopamedia\Batch\Model\ResourceModel\JobExecution as ResourceJobExecution;
+use Dopamedia\Batch\Model\ResourceModel\JobInstance as ResourceJobInstance;
+use Dopamedia\Batch\Model\ResourceModel\StepExecution as ResourceStepExecution;
+use Dopamedia\Batch\Model\ResourceModel\Warning as ResourceWarning;
 use Magento\Framework\Exception\CouldNotSaveException;
+use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\Model\AbstractModel;
+use Magento\Framework\Phrase;
 
 /**
  * Class JobRepository
@@ -27,97 +28,244 @@ use Magento\Framework\Exception\CouldNotSaveException;
 class JobRepository implements JobRepositoryInterface
 {
     /**
-     * @var JobExecutionRepositoryInterface
+     * @var ResourceJobExecution
      */
-    private $jobExecutionRepository;
+    private $resourceJobExecution;
 
     /**
-     * @var JobInstanceRepositoryInterface
-     */
-    private $jobInstanceRepository;
-
-    /**
-     * @var StepExecutionRepositoryInterface
-     */
-    private $stepExecutionRepository;
-
-    /**
-     * @var WarningRepositoryInterface
-     */
-    private $warningRepository;
-
-    /**
-     * @var JobExecutionInterfaceFactory
+     * @var JobExecutionFactory
      */
     private $jobExecutionFactory;
 
     /**
-     * @var WarningInterfaceFactory
+     * @var ResourceJobInstance
+     */
+    private $resourceJobInstance;
+
+    /**
+     * @var JobInstanceFactory
+     */
+    private $jobInstanceFactory;
+
+    /**
+     * @var ResourceStepExecution
+     */
+    private $resourceStepExecution;
+
+    /**
+     * @var StepExecutionFactory
+     */
+    private $stepExecutionFactory;
+
+    /**
+     * @var ResourceWarning
+     */
+    private $resourceWarning;
+
+    /**
+     * @var WarningFactory
      */
     private $warningFactory;
 
     /**
      * JobRepository constructor.
-     * @param JobExecutionRepositoryInterface $jobExecutionRepository
-     * @param JobInstanceRepositoryInterface $jobInstanceRepository
-     * @param StepExecutionRepositoryInterface $stepExecutionRepository
-     * @param WarningRepositoryInterface $warningRepository
-     * @param JobExecutionInterfaceFactory $jobExecutionFactory
-     * @param WarningInterfaceFactory $warningFactory
+     * @param ResourceJobExecution $resourceJobExecution
+     * @param JobExecutionFactory $jobExecutionFactory
+     * @param ResourceJobInstance $resourceJobInstance
+     * @param JobInstanceFactory $jobInstanceFactory
+     * @param ResourceStepExecution $resourceStepExecution
+     * @param StepExecutionFactory $stepExecutionFactory
+     * @param ResourceWarning $resourceWarning
+     * @param WarningFactory $warningFactory
      */
     public function __construct(
-        JobExecutionRepositoryInterface $jobExecutionRepository,
-        JobInstanceRepositoryInterface $jobInstanceRepository,
-        StepExecutionRepositoryInterface $stepExecutionRepository,
-        WarningRepositoryInterface $warningRepository,
-        JobExecutionInterfaceFactory $jobExecutionFactory,
-        WarningInterfaceFactory $warningFactory
+        ResourceJobExecution $resourceJobExecution,
+        JobExecutionFactory $jobExecutionFactory,
+        ResourceJobInstance $resourceJobInstance,
+        JobInstanceFactory $jobInstanceFactory,
+        ResourceStepExecution $resourceStepExecution,
+        StepExecutionFactory $stepExecutionFactory,
+        ResourceWarning $resourceWarning,
+        WarningFactory $warningFactory
     )
     {
-        $this->jobExecutionRepository = $jobExecutionRepository;
-        $this->stepExecutionRepository = $stepExecutionRepository;
-        $this->jobInstanceRepository = $jobInstanceRepository;
-        $this->warningRepository = $warningRepository;
+        $this->resourceJobExecution = $resourceJobExecution;
         $this->jobExecutionFactory = $jobExecutionFactory;
+        $this->resourceJobInstance = $resourceJobInstance;
+        $this->jobInstanceFactory = $jobInstanceFactory;
+        $this->resourceStepExecution = $resourceStepExecution;
+        $this->stepExecutionFactory = $stepExecutionFactory;
+        $this->resourceWarning = $resourceWarning;
         $this->warningFactory = $warningFactory;
     }
 
     /**
-     * @param JobInstanceInterface $jobInstance
-     * @param JobParameters $jobParameters
+     * @param int $id
      * @return JobExecutionInterface
-     * @throws CouldNotSaveException
+     * @throws NoSuchEntityException
      */
-    public function createJobExecution(JobInstanceInterface $jobInstance, JobParameters $jobParameters): JobExecutionInterface
+    public function getJobExecutionById(int $id): JobExecutionInterface
     {
-        $this->jobInstanceRepository->save($jobInstance);
+        /** @var JobExecution $jobExecution */
+        $jobExecution = $this->jobExecutionFactory->create();
+        $this->resourceJobExecution->load($jobExecution, $id);
 
-        /** @var JobExecutionInterface $jobExecution */
-        $jobExecution = $this->jobExecutionFactory->create()
-            ->setJobInstance($jobInstance)
-            ->setJobParameters($jobParameters);
-
-        $this->jobExecutionRepository->save($jobExecution);
+        if ($jobExecution->getId() === null) {
+            throw new NoSuchEntityException(
+                new Phrase('JobExecution with id "%1" does not exist.', [$id])
+            );
+        }
 
         return $jobExecution;
     }
 
     /**
-     * @param JobExecutionInterface $jobExecution
-     * @throws CouldNotSaveException
+     * @param JobInstanceInterface|AbstractModel $jobInstance
+     * @param JobParameters $jobParameters
+     * @return JobExecutionInterface
+     * @throws \Exception
+     * @throws \Magento\Framework\Exception\AlreadyExistsException
      */
-    public function updateJobExecution(JobExecutionInterface $jobExecution): void
+    public function createJobExecution(JobInstanceInterface $jobInstance, JobParameters $jobParameters): JobExecutionInterface
     {
-        $this->jobExecutionRepository->save($jobExecution);
+        $this->resourceJobInstance->save($jobInstance);
+
+        /** @var JobExecution $jobExecution */
+        $jobExecution = $this->jobExecutionFactory->create()
+            ->setJobInstance($jobInstance)
+            ->setJobParameters($jobParameters);
+
+        $this->resourceJobExecution->save($jobExecution);
+
+        return $jobExecution;
     }
 
     /**
-     * @param StepExecutionInterface $stepExecution
+     * @param JobExecutionInterface|AbstractModel $jobExecution
+     * @return JobExecutionInterface
      * @throws CouldNotSaveException
      */
-    public function updateStepExecution(StepExecutionInterface $stepExecution): void
+    public function saveJobExecution(JobExecutionInterface $jobExecution): JobExecutionInterface
     {
-        $this->stepExecutionRepository->save($stepExecution);
+        try {
+            $this->resourceJobExecution->save($jobExecution);
+        } catch (\Exception $e) {
+            throw new CouldNotSaveException(__($e->getMessage()));
+        }
+
+        return $jobExecution;
+    }
+
+    /**
+     * @param int $id
+     * @return JobInstanceInterface
+     * @throws NoSuchEntityException
+     */
+    public function getJobInstanceById(int $id): JobInstanceInterface
+    {
+        /** @var JobInstance $jobInstance */
+        $jobInstance = $this->jobInstanceFactory->create();
+        $this->resourceJobInstance->load($jobInstance, $id);
+
+        if ($jobInstance->getId() === null) {
+            throw new NoSuchEntityException(
+                new Phrase('JobInstance with id "%1" does not exist.', [$id])
+            );
+        }
+
+        return $jobInstance;
+    }
+
+    /**
+     * @param string $code
+     * @return JobInstanceInterface
+     * @throws NoSuchEntityException
+     */
+    public function getJobInstanceByCode(string $code): JobInstanceInterface
+    {
+        /** @var JobInstance $jobInstance */
+        $jobInstance = $this->jobInstanceFactory->create();
+        $this->resourceJobInstance->load($jobInstance, $code, JobInstance::CODE);
+
+        if ($jobInstance->getId() === null) {
+            throw new NoSuchEntityException(
+                new Phrase('JobInstance with code "%1" does not exist.', [$code])
+            );
+        }
+
+        return $jobInstance;
+    }
+
+    /**
+     * @param JobInstanceInterface|AbstractModel $jobInstance
+     * @return JobInstanceInterface
+     * @throws CouldNotSaveException
+     */
+    public function saveJobInstance(JobInstanceInterface $jobInstance): JobInstanceInterface
+    {
+        try {
+            $this->resourceJobInstance->save($jobInstance);
+        } catch (\Exception $e) {
+            throw new CouldNotSaveException(__($e->getMessage()));
+        }
+
+        return $jobInstance;
+    }
+
+    /**
+     * @param int $id
+     * @return StepExecutionInterface
+     * @throws NoSuchEntityException
+     */
+    public function getStepExecutionById(int $id): StepExecutionInterface
+    {
+        /** @var StepExecution $stepExecution */
+        $stepExecution = $this->stepExecutionFactory->create();
+        $this->resourceStepExecution->load($stepExecution, $id);
+
+        if ($stepExecution->getId() === null) {
+            throw new NoSuchEntityException(
+                new Phrase('StepExecution with id "%1" does not exist.', [$id])
+            );
+        }
+
+        return $stepExecution;
+    }
+
+    /**
+     * @param StepExecutionInterface|AbstractModel $stepExecution
+     * @return StepExecutionInterface
+     * @throws CouldNotSaveException
+     */
+    public function saveStepExecution(StepExecutionInterface $stepExecution): StepExecutionInterface
+    {
+        try {
+            $this->resourceStepExecution->save($stepExecution);
+        } catch (\Exception $e) {
+            throw new CouldNotSaveException(__($e->getMessage()));
+        }
+
+        return $stepExecution;
+    }
+
+    /**
+     * @param int $id
+     * @return WarningInterface
+     * @throws NoSuchEntityException
+     */
+    public function getWarningById(int $id): WarningInterface
+    {
+        /** @var Warning $waring */
+        $waring = $this->warningFactory->create();
+        $this->resourceWarning->load($waring, $id);
+
+        if ($waring->getId() === null) {
+            throw new NoSuchEntityException(
+                new Phrase('Warning with id "%1" does not exist.', [$id])
+            );
+        }
+
+        return $waring;
     }
 
     /**
@@ -126,7 +274,8 @@ class JobRepository implements JobRepositoryInterface
      * @param array $reasonParameters
      * @param array $item
      * @return WarningInterface
-     * @throws CouldNotSaveException
+     * @throws \Exception
+     * @throws \Magento\Framework\Exception\AlreadyExistsException
      */
     public function createWarning(
         StepExecutionInterface $stepExecution,
@@ -135,14 +284,30 @@ class JobRepository implements JobRepositoryInterface
         array $item = []
     ): WarningInterface
     {
-        /** @var WarningInterface $warning */
+        /** @var Warning $warning */
         $warning = $this->warningFactory->create()
             ->setStepExecution($stepExecution)
             ->setReason($reason)
             ->setReasonParameters($reasonParameters)
             ->setItem($item);
 
-        $this->warningRepository->save($warning);
+        $this->resourceWarning->save($warning);
+
+        return $warning;
+    }
+
+    /**
+     * @param WarningInterface|AbstractModel $warning
+     * @return WarningInterface
+     * @throws CouldNotSaveException
+     */
+    public function saveWarning(WarningInterface $warning): WarningInterface
+    {
+        try {
+            $this->resourceWarning->save($warning);
+        } catch (\Exception $e) {
+            throw new CouldNotSaveException(__($e->getMessage()));
+        }
 
         return $warning;
     }

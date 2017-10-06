@@ -6,12 +6,12 @@
 
 namespace Dopamedia\Batch\Console\Command;
 
-use Dopamedia\Batch\Api\JobInstanceRepositoryInterface;
 use Dopamedia\Batch\Model\JobInstance;
 use Dopamedia\PhpBatch\Job\JobParametersFactory;
 use Dopamedia\PhpBatch\Job\JobRegistryInterface;
 use Dopamedia\PhpBatch\Job\UndefinedJobException;
 use Dopamedia\PhpBatch\JobInstanceInterfaceFactory;
+use Dopamedia\PhpBatch\Repository\JobRepositoryInterface;
 use Magento\Framework\Exception\CouldNotSaveException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -41,9 +41,9 @@ class JobCreateCommand extends Command
     private $jobRegistry;
 
     /**
-     * @var JobInstanceRepositoryInterface
+     * @var JobRepositoryInterface
      */
-    private $jobInstanceRepository;
+    private $jobRepository;
 
     /**
      * @var JobParametersFactory
@@ -54,19 +54,19 @@ class JobCreateCommand extends Command
      * BatchJobCreateCommand constructor.
      * @param JobInstanceInterfaceFactory $jobInstanceFactory
      * @param JobRegistryInterface $jobRegistry
-     * @param JobInstanceRepositoryInterface $jobInstanceRepository
+     * @param JobRepositoryInterface $jobRepository
      * @param JobParametersFactory $jobParametersFactory
      */
     public function __construct(
         JobInstanceInterfaceFactory $jobInstanceFactory,
         JobRegistryInterface $jobRegistry,
-        JobInstanceRepositoryInterface $jobInstanceRepository,
+        JobRepositoryInterface $jobRepository,
         JobParametersFactory $jobParametersFactory
     )
     {
         $this->jobInstanceFactory = $jobInstanceFactory;
         $this->jobRegistry = $jobRegistry;
-        $this->jobInstanceRepository = $jobInstanceRepository;
+        $this->jobRepository = $jobRepository;
         $this->jobParametersFactory = $jobParametersFactory;
         parent::__construct();
     }
@@ -98,7 +98,10 @@ class JobCreateCommand extends Command
     }
 
     /**
-     * @inheritDoc
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return int
+     * @throws \Exception
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
@@ -125,7 +128,7 @@ class JobCreateCommand extends Command
         //TODO::implement validation
 
         try {
-            $this->jobInstanceRepository->save($jobInstance);
+            $this->jobRepository->saveJobInstance($jobInstance);
         } catch (CouldNotSaveException $e) {
             $output->writeln(sprintf('<error>%s</error>', $e->getMessage()));
             return Cli::RETURN_FAILURE;

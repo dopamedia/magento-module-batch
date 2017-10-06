@@ -32,11 +32,6 @@ class JobExecuteCommand extends Command
     private const OPTION_NAME_VERBOSE = 'verbose';
 
     /**
-     * @var JobInstanceRepositoryInterface
-     */
-    private $jobInstanceRepository;
-
-    /**
      * @var JobRegistryInterface
      */
     private $jobRegistry;
@@ -58,21 +53,18 @@ class JobExecuteCommand extends Command
 
     /**
      * JobExecuteCommand constructor.
-     * @param JobInstanceRepositoryInterface $jobInstanceRepository
      * @param JobRegistryInterface $jobRegistry
      * @param JobRepositoryInterface $jobRepository
      * @param JobParametersFactory $jobParametersFactory
      * @param JobParametersValidator $jobParametersValidator
      */
     public function __construct(
-        JobInstanceRepositoryInterface $jobInstanceRepository,
         JobRegistryInterface $jobRegistry,
         JobRepositoryInterface $jobRepository,
         JobParametersFactory $jobParametersFactory,
         JobParametersValidator $jobParametersValidator
     )
     {
-        $this->jobInstanceRepository = $jobInstanceRepository;
         $this->jobRegistry = $jobRegistry;
         $this->jobRepository = $jobRepository;
         $this->jobParametersFactory = $jobParametersFactory;
@@ -106,12 +98,12 @@ class JobExecuteCommand extends Command
      * @param InputInterface $input
      * @param OutputInterface $output
      * @return int
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws \Exception
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $code = $input->getArgument(self::ARGUMENT_NAME_CODE);
-        $jobInstance = $this->jobInstanceRepository->getByCode($code);
+        $jobInstance = $this->jobRepository->getJobInstanceByCode($code);
         $job = $this->jobRegistry->getJob($jobInstance->getJobName());
         $rawParameters = $jobInstance->getRawParameters();
         if ($config = $input->getOption(self::OPTION_NAME_CONFIG)) {
@@ -139,7 +131,7 @@ class JobExecuteCommand extends Command
 
         $job->execute($jobExecution);
 
-        $this->jobRepository->updateJobExecution($jobExecution);
+        $this->jobRepository->saveJobExecution($jobExecution);
 
         $verbose = $input->getOption(self::OPTION_NAME_VERBOSE);
 

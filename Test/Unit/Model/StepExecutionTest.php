@@ -16,6 +16,7 @@ use Dopamedia\PhpBatch\Item\InvalidItemInterface;
 use Dopamedia\PhpBatch\Job\RuntimeErrorException;
 use Dopamedia\PhpBatch\JobExecutionInterface;
 use Dopamedia\PhpBatch\Job\JobParameters;
+use Dopamedia\PhpBatch\Repository\JobRepositoryInterface;
 use Dopamedia\PhpBatch\WarningInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Phrase;
@@ -31,9 +32,9 @@ use PHPUnit\Framework\TestCase;
 class StepExecutionTest extends TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|JobExecutionRepositoryInterface
+     * @var \PHPUnit_Framework_MockObject_MockObject|JobRepositoryInterface
      */
-    protected $jobExecutionRepositoryMock;
+    protected $jobRepository;
 
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject|JobExecutionInterface
@@ -78,7 +79,7 @@ class StepExecutionTest extends TestCase
 
     protected function setUp()
     {
-        $this->jobExecutionRepositoryMock = $this->createMock(JobExecutionRepositoryInterface::class);
+        $this->jobRepository = $this->createMock(JobRepositoryInterface::class);
         $this->jobExecutionMock = $this->createMock(JobExecutionInterface::class);
         $this->jobParametersMock = $this->createMock(JobParameters::class);
         $this->serializerMock = $this->createMock(Serializer::class);
@@ -103,7 +104,7 @@ class StepExecutionTest extends TestCase
         return $this->objectManager->getObject(
             StepExecution::class,
             [
-                'jobExecutionRepository' => $this->jobExecutionRepositoryMock,
+                'jobRepository' => $this->jobRepository,
                 'serializer' => $this->serializerMock,
                 'warningCollectionFactory' => $this->warningCollectionFactoryMock,
                 'warningFactory' => $this->warningFactoryMock
@@ -115,8 +116,8 @@ class StepExecutionTest extends TestCase
     {
         $this->expectException(LocalizedException::class);
 
-        $this->jobExecutionRepositoryMock->expects($this->once())
-            ->method('getById')
+        $this->jobRepository->expects($this->once())
+            ->method('getJobExecutionById')
             ->willThrowException(new LocalizedException(new Phrase('')));
 
         $stepExecution = $this->getStepExecutionObject();
@@ -127,8 +128,8 @@ class StepExecutionTest extends TestCase
 
     public function testGetJobExecution()
     {
-        $this->jobExecutionRepositoryMock->expects($this->once())
-            ->method('getById')
+        $this->jobRepository->expects($this->once())
+            ->method('getJobExecutionById')
             ->with(123)
             ->willReturn($this->jobExecutionMock);
 

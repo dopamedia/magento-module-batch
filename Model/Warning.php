@@ -8,6 +8,7 @@ namespace Dopamedia\Batch\Model;
 
 use Dopamedia\Batch\Api\StepExecutionRepositoryInterface;
 use Dopamedia\Batch\Model\ResourceModel\Warning as ResourceWarning;
+use Dopamedia\PhpBatch\Repository\JobRepositoryInterface;
 use Dopamedia\PhpBatch\StepExecutionInterface;
 use Dopamedia\PhpBatch\WarningInterface;
 use Magento\Framework\Model\AbstractModel;
@@ -30,9 +31,9 @@ class Warning extends AbstractModel implements WarningInterface, SerializableFie
     /**#@-*/
 
     /**
-     * @var StepExecutionRepositoryInterface
+     * @var JobRepositoryInterface
      */
-    private $stepExecutionRepository;
+    private $jobRepository;
 
     /**
      * @var Serializer
@@ -48,7 +49,7 @@ class Warning extends AbstractModel implements WarningInterface, SerializableFie
      * Warning constructor.
      * @param \Magento\Framework\Model\Context $context
      * @param \Magento\Framework\Registry $registry
-     * @param StepExecutionRepositoryInterface $stepExecutionRepository
+     * @param JobRepositoryInterface $jobRepository
      * @param Serializer $serializer
      * @param \Magento\Framework\Model\ResourceModel\AbstractResource|null $resource
      * @param \Magento\Framework\Data\Collection\AbstractDb|null $resourceCollection
@@ -57,7 +58,7 @@ class Warning extends AbstractModel implements WarningInterface, SerializableFie
     public function __construct(
         \Magento\Framework\Model\Context $context,
         \Magento\Framework\Registry $registry,
-        StepExecutionRepositoryInterface $stepExecutionRepository,
+        JobRepositoryInterface $jobRepository,
         Serializer $serializer,
         \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
         \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
@@ -65,7 +66,7 @@ class Warning extends AbstractModel implements WarningInterface, SerializableFie
     )
     {
         parent::__construct($context, $registry, $resource, $resourceCollection, $data);
-        $this->stepExecutionRepository = $stepExecutionRepository;
+        $this->jobRepository = $jobRepository;
         $this->serializer = $serializer;
     }
 
@@ -122,7 +123,7 @@ class Warning extends AbstractModel implements WarningInterface, SerializableFie
 
     /**
      * @return StepExecutionInterface|null
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws \Exception
      */
     public function getStepExecution(): ?StepExecutionInterface
     {
@@ -131,7 +132,7 @@ class Warning extends AbstractModel implements WarningInterface, SerializableFie
         }
 
         if ($this->stepExecution === null) {
-            $this->stepExecution = $this->stepExecutionRepository->getById($this->getStepExecutionId());
+            $this->stepExecution = $this->jobRepository->getStepExecutionById($this->getStepExecutionId());
         }
 
         return $this->stepExecution;

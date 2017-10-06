@@ -6,7 +6,6 @@
 
 namespace Dopamedia\Batch\Test\Unit\Console\Command;
 
-use Dopamedia\Batch\Api\JobInstanceRepositoryInterface;
 use Dopamedia\Batch\Console\Command\JobCreateCommand;
 use Dopamedia\PhpBatch\Job\JobParameters;
 use Dopamedia\PhpBatch\Job\JobParametersFactory;
@@ -15,6 +14,7 @@ use Dopamedia\PhpBatch\Job\UndefinedJobException;
 use Dopamedia\PhpBatch\JobInstanceInterface;
 use Dopamedia\PhpBatch\JobInstanceInterfaceFactory;
 use Dopamedia\PhpBatch\JobInterface;
+use Dopamedia\PhpBatch\Repository\JobRepositoryInterface;
 use Magento\Framework\Console\Cli;
 use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Framework\Phrase;
@@ -44,9 +44,9 @@ class JobCreateCommandTest extends TestCase
     protected $jobMock;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|JobInstanceRepositoryInterface
+     * @var \PHPUnit_Framework_MockObject_MockObject|JobRepositoryInterface
      */
-    protected $jobInstanceRepositoryMock;
+    protected $jobRepositoryMock;
 
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject|JobParametersFactory
@@ -76,7 +76,7 @@ class JobCreateCommandTest extends TestCase
 
         $this->jobMock = $this->createMock(JobInterface::class);
 
-        $this->jobInstanceRepositoryMock = $this->createMock(JobInstanceRepositoryInterface::class);
+        $this->jobRepositoryMock = $this->createMock(JobRepositoryInterface::class);
 
         $this->jobParametersFactoryMock = $this->createMock(JobParametersFactory::class);
 
@@ -85,7 +85,7 @@ class JobCreateCommandTest extends TestCase
         $this->command = new JobCreateCommand(
             $this->jobInstanceFactoryMock,
             $this->jobRegistryMock,
-            $this->jobInstanceRepositoryMock,
+            $this->jobRepositoryMock,
             $this->jobParametersFactoryMock
         );
     }
@@ -168,8 +168,8 @@ class JobCreateCommandTest extends TestCase
             ->method('setRawParameters')
             ->willReturnSelf();
 
-        $this->jobInstanceRepositoryMock->expects($this->once())
-            ->method('save')
+        $this->jobRepositoryMock->expects($this->once())
+            ->method('saveJobInstance')
             ->willThrowException(new CouldNotSaveException(new Phrase('exception message')));
 
         $commandTester->execute(['job' => 'job', 'code' => 'code']);
@@ -212,8 +212,8 @@ class JobCreateCommandTest extends TestCase
             ->method('setRawParameters')
             ->willReturnSelf();
 
-        $this->jobInstanceRepositoryMock->expects($this->once())
-            ->method('save')
+        $this->jobRepositoryMock->expects($this->once())
+            ->method('saveJobInstance')
             ->willReturn($this->jobInstanceMock);
 
         $this->jobInstanceMock->expects($this->once())
