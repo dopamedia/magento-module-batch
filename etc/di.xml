@@ -16,6 +16,7 @@
     <preference for="Dopamedia\Batch\Reader\File\FileIteratorInterface" type="Dopamedia\Batch\Reader\File\FlatFileIterator" />
     <preference for="Dopamedia\Batch\Reader\File\HeaderProviderInterface" type="Dopamedia\Batch\Reader\File\FirstRowHeaderProvider" />
 
+
     <type name="Dopamedia\Batch\Step\ValidatorStep">
         <arguments>
             <argument name="name" xsi:type="string">Validate File</argument>
@@ -28,6 +29,15 @@
                 <item name="batchJobCreateCommand" xsi:type="object">Dopamedia\PhpBatch\Console\Command\JobCreateCommand</item>
                 <item name="batchJobExecuteCommand" xsi:type="object">Dopamedia\PhpBatch\Console\Command\JobExecuteCommand</item>
                 <item name="batchJobInstanceListCommand" xsi:type="object">Dopamedia\PhpBatch\Console\Command\JobInstanceListCommand</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="batch_profile_listing_data_source" xsi:type="string">Dopamedia\Batch\Model\ResourceModel\JobInstance\Grid\Collection</item>
+                <item name="batch_execution_listing_data_source" xsi:type="string">Dopamedia\Batch\Model\ResourceModel\JobExecution\Grid\Collection</item>
             </argument>
         </arguments>
     </type>

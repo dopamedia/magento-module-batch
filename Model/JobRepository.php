@@ -215,6 +215,22 @@ class JobRepository implements JobRepositoryInterface
 
     /**
      * @param JobInstanceInterface|AbstractModel $jobInstance
+     * @return bool
+     * @throws CouldNotSaveException
+     */
+    public function deleteJobInstance(JobInstanceInterface $jobInstance): bool
+    {
+        try {
+            $this->resourceJobInstance->delete($jobInstance);
+        } catch (\Exception $e) {
+            throw new CouldNotSaveException(__($e->getMessage()));
+        }
+
+        return true;
+    }
+
+    /**
+     * @param JobInstanceInterface|AbstractModel $jobInstance
      * @return JobInstanceInterface
      * @throws CouldNotSaveException
      */
