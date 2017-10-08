@@ -2,6 +2,7 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
     <preference for="Dopamedia\PhpBatch\JobExecutionInterface" type="Dopamedia\Batch\Model\JobExecution" />
     <preference for="Dopamedia\PhpBatch\JobInstanceInterface" type="Dopamedia\Batch\Model\JobInstance" />
+    <preference for="Dopamedia\PhpBatch\JobInstanceFactoryInterface" type="Dopamedia\Batch\Model\JobInstanceFactory" />
     <preference for="Dopamedia\PhpBatch\StepExecutionInterface" type="Dopamedia\Batch\Model\StepExecution" />
     <preference for="Dopamedia\PhpBatch\WarningInterface" type="Dopamedia\Batch\Model\Warning" />
     <preference for="Dopamedia\PhpBatch\Repository\JobRepositoryInterface" type="Dopamedia\Batch\Model\JobRepository" />
@@ -24,9 +25,9 @@
     <type name="Magento\Framework\Console\CommandListInterface">
         <arguments>
             <argument name="commands" xsi:type="array">
-                <item name="batchJobCreateCommand" xsi:type="object">Dopamedia\Batch\Console\Command\JobCreateCommand</item>
-                <item name="batchJobInstanceListCommand" xsi:type="object">Dopamedia\Batch\Console\Command\JobInstanceListCommand</item>
-                <item name="batchJobExecuteCommand" xsi:type="object">Dopamedia\Batch\Console\Command\JobExecuteCommand</item>
+                <item name="batchJobCreateCommand" xsi:type="object">Dopamedia\PhpBatch\Console\Command\JobCreateCommand</item>
+                <item name="batchJobExecuteCommand" xsi:type="object">Dopamedia\PhpBatch\Console\Command\JobExecuteCommand</item>
+                <item name="batchJobInstanceListCommand" xsi:type="object">Dopamedia\PhpBatch\Console\Command\JobInstanceListCommand</item>
             </argument>
         </arguments>
     </type>

@@ -18,7 +18,6 @@ use Magento\Framework\Serialize\SerializerInterface;
 
 class JobInstance extends AbstractModel implements JobInstanceInterface, SerializableFieldsInterface
 {
-
     use SerializableFieldsTrait;
 
     /**#@+*/

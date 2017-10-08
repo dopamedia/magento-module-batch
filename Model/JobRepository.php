@@ -6,6 +6,7 @@
 
 namespace Dopamedia\Batch\Model;
 
+use Dopamedia\Batch\Model\ResourceModel\JobInstance\Collection as JobInstanceCollection;
 use Dopamedia\PhpBatch\Job\JobParameters;
 use Dopamedia\PhpBatch\JobExecutionInterface;
 use Dopamedia\PhpBatch\JobInstanceInterface;
@@ -48,6 +49,11 @@ class JobRepository implements JobRepositoryInterface
     private $jobInstanceFactory;
 
     /**
+     * @var JobInstanceCollection
+     */
+    private $jobInstanceCollection;
+
+    /**
      * @var ResourceStepExecution
      */
     private $resourceStepExecution;
@@ -73,6 +79,7 @@ class JobRepository implements JobRepositoryInterface
      * @param JobExecutionFactory $jobExecutionFactory
      * @param ResourceJobInstance $resourceJobInstance
      * @param JobInstanceFactory $jobInstanceFactory
+     * @param JobInstanceCollection $jobInstanceCollection
      * @param ResourceStepExecution $resourceStepExecution
      * @param StepExecutionFactory $stepExecutionFactory
      * @param ResourceWarning $resourceWarning
@@ -83,6 +90,7 @@ class JobRepository implements JobRepositoryInterface
         JobExecutionFactory $jobExecutionFactory,
         ResourceJobInstance $resourceJobInstance,
         JobInstanceFactory $jobInstanceFactory,
+        JobInstanceCollection $jobInstanceCollection,
         ResourceStepExecution $resourceStepExecution,
         StepExecutionFactory $stepExecutionFactory,
         ResourceWarning $resourceWarning,
@@ -93,6 +101,7 @@ class JobRepository implements JobRepositoryInterface
         $this->jobExecutionFactory = $jobExecutionFactory;
         $this->resourceJobInstance = $resourceJobInstance;
         $this->jobInstanceFactory = $jobInstanceFactory;
+        $this->jobInstanceCollection = $jobInstanceCollection;
         $this->resourceStepExecution = $resourceStepExecution;
         $this->stepExecutionFactory = $stepExecutionFactory;
         $this->resourceWarning = $resourceWarning;
@@ -194,6 +203,14 @@ class JobRepository implements JobRepositoryInterface
         }
 
         return $jobInstance;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getJobInstances(): array
+    {
+        return $this->jobInstanceCollection->getItems();
     }
 
     /**

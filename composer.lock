@@ -446,17 +446,18 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/dopamedia/php-batch.git",
-                "reference": "5a01288c3bc42a663fe70190dff34b126276f8cd"
+                "reference": "1137785f92f9fa338394029a1322ef13b7e86fc6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/dopamedia/php-batch/zipball/5a01288c3bc42a663fe70190dff34b126276f8cd",
-                "reference": "5a01288c3bc42a663fe70190dff34b126276f8cd",
+                "url": "https://api.github.com/repos/dopamedia/php-batch/zipball/1137785f92f9fa338394029a1322ef13b7e86fc6",
+                "reference": "1137785f92f9fa338394029a1322ef13b7e86fc6",
                 "shasum": ""
             },
             "require": {
                 "myclabs/php-enum": "^1.5",
-                "php": "^7.1"
+                "php": "^7.1",
+                "symfony/console": "~2.3, !=2.7.0"
             },
             "require-dev": {
                 "phpunit/phpunit": "~6.2.0"
@@ -478,7 +479,7 @@
                 }
             ],
             "description": "N/A",
-            "time": "2017-10-06 09:59:05"
+            "time": "2017-10-08 08:27:45"
         },
         {
             "name": "firegento/fastsimpleimport",
