@@ -36,8 +36,8 @@
     <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
         <arguments>
             <argument name="collections" xsi:type="array">
-                <item name="batch_profile_listing_data_source" xsi:type="string">Dopamedia\Batch\Model\ResourceModel\JobInstance\Grid\Collection</item>
-                <item name="batch_execution_listing_data_source" xsi:type="string">Dopamedia\Batch\Model\ResourceModel\JobExecution\Grid\Collection</item>
+                <item name="batch_job_instance_listing_data_source" xsi:type="string">Dopamedia\Batch\Model\ResourceModel\JobInstance\Grid\Collection</item>
+                <item name="batch_job_execution_listing_data_source" xsi:type="string">Dopamedia\Batch\Model\ResourceModel\JobExecution\Grid\Collection</item>
             </argument>
         </arguments>
     </type>

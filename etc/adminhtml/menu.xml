@@ -2,7 +2,7 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
     <menu>
         <add id="Dopamedia_Batch::batch" title="Batch" translate="title" module="Dopamedia_Batch" sortOrder="15" parent="Magento_Backend::system" resource="Dopamedia_Batch::batch" />
-        <add id="Dopamedia_Batch::batch_profile" title="Profiles" translate="title" module="Dopamedia_Batch" sortOrder="10" parent="Dopamedia_Batch::batch" action="batch/profile" resource="Dopamedia_Batch::batch_profile"/>
-        <add id="Dopamedia_Batch::batch_execution" title="Executions" translate="title" module="Dopamedia_Batch" sortOrder="20" parent="Dopamedia_Batch::batch" action="batch/execution" resource="Dopamedia_Batch::batch_executions"/>
+        <add id="Dopamedia_Batch::batch_job_instance" title="Job Instances" translate="title" module="Dopamedia_Batch" sortOrder="10" parent="Dopamedia_Batch::batch" action="batch/jobInstance" resource="Dopamedia_Batch::batch_job_instance"/>
+        <add id="Dopamedia_Batch::batch_job_execution" title="Job Executions" translate="title" module="Dopamedia_Batch" sortOrder="20" parent="Dopamedia_Batch::batch" action="batch/jobExecution" resource="Dopamedia_Batch::batch_job_execution"/>
     </menu>
 </config>

@@ -13,12 +13,13 @@ use Magento\Ui\Component\Listing\Columns\Column;
 use Magento\Framework\Escaper;
 
 /**
- * Class ProfileActions
+ * Class InstanceActions
  * @package Dopamedia\Batch\Ui\Component\Listing\Column
  */
-class ProfileActions extends Column
+class InstanceActions extends Column
 {
-    const URL_PATH_DELETE = 'batch/profile/delete';
+    const URL_PATH_INFO = 'batch/jobInstance/info';
+    const URL_PATH_DELETE = 'batch/jobInstance/delete';
 
     /**
      * @var UrlInterface
@@ -31,10 +32,11 @@ class ProfileActions extends Column
     private $escaper;
 
     /**
-     * ProfileActions constructor.
+     * InstanceActions constructor.
      * @param ContextInterface $context
      * @param UiComponentFactory $uiComponentFactory
      * @param UrlInterface $urlBuilder
+     * @param Escaper $escaper
      * @param array $components
      * @param array $data
      */
@@ -57,6 +59,15 @@ class ProfileActions extends Column
             foreach ($dataSource['data']['items'] as &$item) {
                 $code = $this->escaper->escapeHtml($item['code']);
                 $item[$this->getData('name')] = [
+                    'info' => [
+                        'href' => $this->urlBuilder->getUrl(
+                            self::URL_PATH_INFO,
+                            [
+                                'id' => $item['id']
+                            ]
+                        ),
+                        'label' => __('Info')
+                    ],
                     'delete' => [
                         'href' => $this->urlBuilder->getUrl(
                             self::URL_PATH_DELETE,

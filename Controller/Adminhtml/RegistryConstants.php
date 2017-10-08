@@ -12,5 +12,5 @@ namespace Dopamedia\Batch\Controller\Adminhtml;
  */
 class RegistryConstants
 {
-    public const CURRENT_PROFILE_ID = 'current_profile_id';
+    public const JOB_INSTANCE = 'job_instance';
 }
