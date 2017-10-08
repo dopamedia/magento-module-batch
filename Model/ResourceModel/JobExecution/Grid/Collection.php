@@ -57,10 +57,23 @@ class Collection extends \Magento\Framework\View\Element\UiComponent\DataProvide
     {
         parent::_initSelect();
 
-        $this->getSelect()->join(
-            ['bji' => $this->getTable('batch_job_instance')],
-            'main_table.job_instance_id = bji.id',
-            ['bji.code']
-        );
+        $this->getSelect()
+            ->joinInner(
+                ['bji' => $this->getTable('batch_job_instance')],
+                'main_table.job_instance_id = bji.id')
+            ->joinLeft(
+                ['bse' => $this->getTable('batch_step_execution')],
+                'main_table.id = bse.job_execution_id')
+            ->joinLeft(
+                ['bw' => $this->getTable('batch_warning')],
+                'bse.id = bw.step_execution_id')
+            ->reset(\Zend_Db_Select::COLUMNS)
+            ->columns(
+                [
+                    'main_table.*',
+                    'code' => 'bji.code',
+                    'warning_count' => new \Zend_Db_Expr('COUNT(bw.id)')
+                ])
+            ->group('main_table.id');
     }
 }
