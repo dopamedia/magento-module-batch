@@ -272,17 +272,17 @@ class JobRepository implements JobRepositoryInterface
      */
     public function getWarningById(int $id): WarningInterface
     {
-        /** @var Warning $waring */
-        $waring = $this->warningFactory->create();
-        $this->resourceWarning->load($waring, $id);
+        /** @var Warning $warning */
+        $warning = $this->warningFactory->create();
+        $this->resourceWarning->load($warning, $id);
 
-        if ($waring->getId() === null) {
+        if ($warning->getId() === null) {
             throw new NoSuchEntityException(
                 new Phrase('Warning with id "%1" does not exist.', [$id])
             );
         }
 
-        return $waring;
+        return $warning;
     }
 
     /**
