@@ -13,7 +13,7 @@ use Magento\Framework\App\State;
 use FireGento\FastSimpleImport\Model\Importer;
 use FireGento\FastSimpleImport\Model\ImporterFactory;
 use FireGento\FastSimpleImport\Model\Adapters\NestedArrayAdapterFactory;
-use Dopamedia\PhpBatch\Item\InvalidItemException;
+use Dopamedia\Batch\ArrayConverter\FlatToStandard\Product as ProductArrayConverter;
 use Dopamedia\PhpBatch\Item\ItemWriterInterface;
 use Magento\ImportExport\Model\Import;
 
@@ -44,33 +44,49 @@ class ProductWriter extends AbstractWriter implements ItemWriterInterface
     private $nestedArrayAdapterFactory;
 
     /**
+     * @var ProductArrayConverter
+     */
+    private $productArrayConverter;
+
+    /**
      * ProductWriter constructor.
      * @param SkuProcessor $skuProcessor
      * @param State $state
      * @param ImporterFactory $importerFactory
      * @param NestedArrayAdapterFactory $nestedArrayAdapterFactory
+     * @param ProductArrayConverter $productArrayConverter
      */
     public function __construct(
         SkuProcessor $skuProcessor,
         State $state,
         ImporterFactory $importerFactory,
-        NestedArrayAdapterFactory $nestedArrayAdapterFactory
+        NestedArrayAdapterFactory $nestedArrayAdapterFactory,
+        ProductArrayConverter $productArrayConverter
     )
     {
         $this->skuProcessor = $skuProcessor;
         $this->state = $state;
         $this->importerFactory = $importerFactory;
         $this->nestedArrayAdapterFactory = $nestedArrayAdapterFactory;
+        $this->productArrayConverter = $productArrayConverter;
     }
 
     /**
      * @param array $items
-     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function write(array $items)
     {
+        $convertedItems = [];
+
         foreach ($items as $item) {
-            $this->incrementCount($item);
+            $convertedItems = array_merge(
+                $this->productArrayConverter->convert($item),
+                $convertedItems
+            );
+        }
+
+        foreach ($convertedItems as $convertedItem) {
+            $this->incrementCount($convertedItem);
         }
 
         try {
@@ -79,7 +95,9 @@ class ProductWriter extends AbstractWriter implements ItemWriterInterface
             // noop
         }
 
-        $this->createImporter()->processImport($items);
+        $importer = $this->createImporter();
+
+        $importer->processImport($convertedItems);
     }
 
     /**
