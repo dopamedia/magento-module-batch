@@ -19,7 +19,7 @@ class NoopProcessor implements ItemProcessorInterface
      */
     public function process($item)
     {
-        return null;
+        return $item;
     }
 
 }
