@@ -14,6 +14,6 @@ class NoopProcessorTest extends TestCase
     public function testProcess()
     {
         $noopProcessor = new NoopProcessor();
-        $this->assertNull($noopProcessor->process([]));
+        $this->assertEquals(['item'], $noopProcessor->process(['item']));
     }
 }
