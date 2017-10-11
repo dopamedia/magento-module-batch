@@ -22,6 +22,22 @@
         </arguments>
     </type>
 
+    <type name="Dopamedia\PhpBatch\Job\JobParameters\DefaultValuesProviderRegistryInterface">
+        <arguments>
+            <argument name="defaultValuesProviders" xsi:type="array">
+                <item name="emptyDefaultValuesProvider" xsi:type="object">Dopamedia\PhpBatch\Job\JobParameters\EmptyDefaultValuesProvider</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="Dopamedia\PhpBatch\Job\JobParameters\ValidatorProviderRegistryInterface">
+        <arguments>
+            <argument name="validatorProviders" xsi:type="array">
+                <item name="emptyValidatorProvider" xsi:type="object">Dopamedia\PhpBatch\Job\JobParameters\EmptyValidatorProvider</item>
+            </argument>
+        </arguments>
+    </type>
+
     <type name="Magento\Framework\Console\CommandListInterface">
         <arguments>
             <argument name="commands" xsi:type="array">
@@ -31,4 +47,5 @@
             </argument>
         </arguments>
     </type>
+
 </config>

@@ -446,12 +446,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/dopamedia/php-batch.git",
-                "reference": "1137785f92f9fa338394029a1322ef13b7e86fc6"
+                "reference": "161374485ee0da2dd300ff788ee5da049fef030d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/dopamedia/php-batch/zipball/1137785f92f9fa338394029a1322ef13b7e86fc6",
-                "reference": "1137785f92f9fa338394029a1322ef13b7e86fc6",
+                "url": "https://api.github.com/repos/dopamedia/php-batch/zipball/161374485ee0da2dd300ff788ee5da049fef030d",
+                "reference": "161374485ee0da2dd300ff788ee5da049fef030d",
                 "shasum": ""
             },
             "require": {
@@ -479,7 +479,7 @@
                 }
             ],
             "description": "N/A",
-            "time": "2017-10-08 08:27:45"
+            "time": "2017-10-11 16:07:57"
         },
         {
             "name": "firegento/fastsimpleimport",
@@ -523,16 +523,16 @@
         },
         {
             "name": "justinrainbow/json-schema",
-            "version": "5.2.4",
+            "version": "5.2.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/justinrainbow/json-schema.git",
-                "reference": "7ccb0e67ea8ace0f84c40900ca3c8a234467628c"
+                "reference": "0d4fda8efdf216ade084a7f0aad5637572ce9835"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/justinrainbow/json-schema/zipball/7ccb0e67ea8ace0f84c40900ca3c8a234467628c",
-                "reference": "7ccb0e67ea8ace0f84c40900ca3c8a234467628c",
+                "url": "https://api.github.com/repos/justinrainbow/json-schema/zipball/0d4fda8efdf216ade084a7f0aad5637572ce9835",
+                "reference": "0d4fda8efdf216ade084a7f0aad5637572ce9835",
                 "shasum": ""
             },
             "require": {
@@ -585,7 +585,7 @@
                 "json",
                 "schema"
             ],
-            "time": "2017-10-04T20:57:36+00:00"
+            "time": "2017-10-10T13:22:37+00:00"
         },
         {
             "name": "magento/framework",
