@@ -4,11 +4,11 @@
  * Date: 12.10.17
  */
 
-namespace Dopamedia\Batch\Model\Import;
+namespace Dopamedia\Batch\Model\Import\Source;
 
 /**
  * Class ArraySource
- * @package Dopamedia\Batch\Model\Import
+ * @package Dopamedia\Batch\Model\Import\Source
  */
 class ArraySource extends \Magento\ImportExport\Model\Import\AbstractSource
 {
@@ -20,7 +20,7 @@ class ArraySource extends \Magento\ImportExport\Model\Import\AbstractSource
     /**
      * @var int
      */
-    private $position;
+    private $position = 0;
 
     /**
      * ArraySource constructor.
@@ -99,7 +99,7 @@ class ArraySource extends \Magento\ImportExport\Model\Import\AbstractSource
             }
         }
 
-        return $colNames;
+        return array_keys($colNames);
     }
 
     /**
@@ -111,5 +111,4 @@ class ArraySource extends \Magento\ImportExport\Model\Import\AbstractSource
 
         return $this->current();
     }
-
 }
