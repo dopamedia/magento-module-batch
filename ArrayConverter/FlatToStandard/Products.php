@@ -36,13 +36,13 @@ class Products implements ArrayConverterInterface
     {
         $convertedItems = [];
 
-        foreach ($items as &$item) {
+        foreach ($items as $item) {
             $convertedItems = array_merge(
                 $convertedItems,
                 $this->productArrayConverter->convert($item)
             );
         }
-
+        
         return $convertedItems;
     }
 }
