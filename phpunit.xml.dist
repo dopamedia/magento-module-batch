@@ -11,12 +11,15 @@
     <filter>
         <whitelist addUncoveredFilesFromWhiteList="true">
             <directory suffix=".php">Adapter</directory>
+            <directory suffix=".php">ArrayConverter</directory>
             <directory suffix=".php">Item</directory>
             <directory suffix=".php">Job</directory>
             <directory suffix=".php">Model</directory>
+            <directory suffix=".php">Plugin</directory>
             <directory suffix=".php">Processor</directory>
-            <directory suffix=".php">Step</directory>
             <directory suffix=".php">Reader</directory>
+            <directory suffix=".php">Step</directory>
+            <directory suffix=".php">ValueConverter</directory>
             <directory suffix=".php">Writer</directory>
         </whitelist>
     </filter>

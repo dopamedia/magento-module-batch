@@ -9,11 +9,6 @@ namespace Dopamedia\Batch\Test\Unit\Model\Import\Source;
 use Dopamedia\Batch\Model\Import\Source\ArraySource;
 use PHPUnit\Framework\TestCase;
 
-/**
- * Class ArraySourceTest
- * @package Dopamedia\Batch\Test\Unit\Model\Import\Source
- * @group current
- */
 class ArraySourceTest extends TestCase
 {
     /**

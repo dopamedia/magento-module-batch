@@ -26,9 +26,6 @@ use Magento\Framework\Serialize\Serializer\Json as Serializer;
 use Magento\Framework\TestFramework\Unit\Helper\ObjectManager;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @group current
- */
 class StepExecutionTest extends TestCase
 {
     /**

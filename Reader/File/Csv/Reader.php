@@ -39,6 +39,7 @@ class Reader implements ItemReaderInterface, StepExecutionAwareInterface, Flusha
      * @var FileIteratorInterface
      */
     private $fileIterator;
+
     /**
      * @var HeaderProviderInterface
      */

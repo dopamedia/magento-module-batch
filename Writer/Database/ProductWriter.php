@@ -6,16 +6,12 @@
 
 namespace Dopamedia\Batch\Writer\Database;
 
-use Magento\Backend\App\Area\FrontNameResolver;
-use Magento\Catalog\Model\Product;
-use Magento\CatalogImportExport\Model\Import\Product\SkuProcessor;
-use Magento\Framework\App\State;
-use FireGento\FastSimpleImport\Model\Importer;
-use FireGento\FastSimpleImport\Model\ImporterFactory;
-use FireGento\FastSimpleImport\Model\Adapters\NestedArrayAdapterFactory;
-use Dopamedia\Batch\ArrayConverter\FlatToStandard\Product as ProductArrayConverter;
+use Dopamedia\Batch\Model\Import\Source\ArraySourceFactory;
+use Dopamedia\Batch\Model\Import\Source\ArraySource;
+use Dopamedia\Batch\ArrayConverter\FlatToStandard\Products as ProductsArrayConverter;
 use Dopamedia\PhpBatch\Item\ItemWriterInterface;
-use Magento\ImportExport\Model\Import;
+use Magento\ImportExport\Model\Import as ImportModel;
+use Magento\ImportExport\Model\ImportFactory as ImportModelFactory;
 
 /**
  * Class ProductWriter
@@ -24,51 +20,48 @@ use Magento\ImportExport\Model\Import;
 class ProductWriter extends AbstractWriter implements ItemWriterInterface
 {
     /**
-     * @var SkuProcessor
+     * @var ProductsArrayConverter
      */
-    private $skuProcessor;
+    private $productsArrayConverter;
 
     /**
-     * @var State
+     * @var ImportModelFactory
      */
-    private $state;
+    private $importModelFactory;
 
     /**
-     * @var ImporterFactory
+     * @var ArraySourceFactory
      */
-    private $importerFactory;
+    private $arraySourceFactory;
 
     /**
-     * @var NestedArrayAdapterFactory
+     * @var array
      */
-    private $nestedArrayAdapterFactory;
+    private $options;
 
     /**
-     * @var ProductArrayConverter
+     * @var ImportModel
      */
-    private $productArrayConverter;
+    private $importModel;
 
     /**
      * ProductWriter constructor.
-     * @param SkuProcessor $skuProcessor
-     * @param State $state
-     * @param ImporterFactory $importerFactory
-     * @param NestedArrayAdapterFactory $nestedArrayAdapterFactory
-     * @param ProductArrayConverter $productArrayConverter
+     * @param ProductsArrayConverter $productsArrayConverter
+     * @param ImportModelFactory $importModelFactory
+     * @param ArraySourceFactory $arraySourceFactory
+     * @param array $options
      */
     public function __construct(
-        SkuProcessor $skuProcessor,
-        State $state,
-        ImporterFactory $importerFactory,
-        NestedArrayAdapterFactory $nestedArrayAdapterFactory,
-        ProductArrayConverter $productArrayConverter
+        ProductsArrayConverter $productsArrayConverter,
+        ImportModelFactory $importModelFactory,
+        ArraySourceFactory $arraySourceFactory,
+        array $options = []
     )
     {
-        $this->skuProcessor = $skuProcessor;
-        $this->state = $state;
-        $this->importerFactory = $importerFactory;
-        $this->nestedArrayAdapterFactory = $nestedArrayAdapterFactory;
-        $this->productArrayConverter = $productArrayConverter;
+        $this->productsArrayConverter = $productsArrayConverter;
+        $this->importModelFactory = $importModelFactory;
+        $this->arraySourceFactory = $arraySourceFactory;
+        $this->options = $options;
     }
 
     /**
@@ -76,55 +69,56 @@ class ProductWriter extends AbstractWriter implements ItemWriterInterface
      */
     public function write(array $items)
     {
-        $convertedItems = [];
+        $items = $this->productsArrayConverter->convert($items);
 
-        foreach ($items as $item) {
-            $convertedItems = array_merge(
-                $this->productArrayConverter->convert($item),
-                $convertedItems
-            );
+        if ($this->importModel === null) {
+            $this->importModel = $this->createImportModel();
         }
 
-        foreach ($convertedItems as $convertedItem) {
-            $this->incrementCount($convertedItem);
-        }
+        /** @var ArraySource $source */
+        $source = $this->arraySourceFactory->create(['data' => $items]);
 
-        try {
-            $this->state->setAreaCode(FrontNameResolver::AREA_CODE);
-        } catch (\Exception $e) {
-            // noop
-        }
+        $validationResults = $this->importModel->validateSource($source);
 
-        $importer = $this->createImporter();
-
-        $importer->processImport($convertedItems);
-    }
-
-    /**
-     * @return Importer
-     */
-    private function createImporter(): Importer
-    {
-        /** @var Importer $importer */
-        $importer = $this->importerFactory->create();
-        $importer->setImportAdapterFactory($this->nestedArrayAdapterFactory);
-        $importer->setBehavior(Import::BEHAVIOR_APPEND);
-        $importer->setEntityCode(Product::ENTITY);
-
-        return $importer;
-    }
-
-    /**
-     * @param array $item
-     */
-    protected function incrementCount(array $item): void
-    {
-        $oldSkus = $this->skuProcessor->getOldSkus();
-
-        if (in_array(strtolower($item['sku']), array_keys($oldSkus))) {
-            $this->stepExecution->incrementSummaryInfo('update');
+        if ($validationResults !== true) {
+            $this->stepExecution->addError($this->importModel->getFormatedLogTrace());
         } else {
-            $this->stepExecution->incrementSummaryInfo('create');
+            try {
+                $result = $this->importModel->importSource();
+
+                $this->incrementSummaryInfo();
+
+                if ($result === false) {
+                    $this->stepExecution->addError($this->importModel->getFormatedLogTrace());
+                }
+
+            } catch (\Exception $e) {
+                $this->stepExecution->addError($e->getMessage());
+                $this->stepExecution->addError($this->importModel->getFormatedLogTrace());
+            }
         }
+    }
+
+    /**
+     * @return ImportModel
+     */
+    private function createImportModel(): ImportModel
+    {
+        $jobParameters = $this->stepExecution->getJobParameters();
+
+        $importOptions = $jobParameters->has('import_options') ? (array)$jobParameters->get('import_options') : [];
+
+        /** @var ImportModel $importModel */
+        return $this->importModelFactory->create()->setData(array_merge($this->options, $importOptions));
+    }
+
+    /**
+     * @return void
+     */
+    private function incrementSummaryInfo(): void
+    {
+        $this->stepExecution->addSummaryInfo('update', $this->importModel->getUpdatedItemsCount());
+        $this->stepExecution->addSummaryInfo('create', $this->importModel->getCreatedItemsCount());
+        $this->stepExecution->addSummaryInfo('delete', $this->importModel->getDeletedItemsCount());
     }
 }

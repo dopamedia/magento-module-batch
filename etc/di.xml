@@ -16,12 +16,6 @@
     <preference for="Dopamedia\Batch\Reader\File\FileIteratorInterface" type="Dopamedia\Batch\Reader\File\FlatFileIterator" />
     <preference for="Dopamedia\Batch\Reader\File\HeaderProviderInterface" type="Dopamedia\Batch\Reader\File\FirstRowHeaderProvider" />
 
-    <type name="Dopamedia\Batch\Step\ValidatorStep">
-        <arguments>
-            <argument name="name" xsi:type="string">Validate File</argument>
-        </arguments>
-    </type>
-
     <type name="Dopamedia\PhpBatch\Job\JobParameters\DefaultValuesProviderRegistryInterface">
         <arguments>
             <argument name="defaultValuesProviders" xsi:type="array">
@@ -36,6 +30,29 @@
                 <item name="emptyValidatorProvider" xsi:type="object">Dopamedia\PhpBatch\Job\JobParameters\EmptyValidatorProvider</item>
             </argument>
         </arguments>
+    </type>
+
+    <type name="Dopamedia\Batch\Step\ValidatorStep">
+        <arguments>
+            <argument name="name" xsi:type="string">Validate File</argument>
+        </arguments>
+    </type>
+
+    <type name="Dopamedia\Batch\Writer\Database\ProductWriter">
+        <arguments>
+            <argument name="options" xsi:type="array">
+                <item name="entity" xsi:type="string">catalog_product</item>
+                <item name="behavior" xsi:type="string">append</item>
+                <item name="ignore_duplicates" xsi:type="string">0</item>
+                <item name="validation_strategy" xsi:type="string">validation-stop-on-errors</item>
+                <item name="allowed_error_count" xsi:type="string">10</item>
+                <item name="_import_multiple_value_separator" xsi:type="string">,</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="Dopamedia\PhpBatch\Console\Command\JobExecuteCommand">
+        <plugin name="setAreaCode" type="Dopamedia\Batch\Plugin\Console\Command\JobExecuteCommand\Plugin" />
     </type>
 
     <type name="Magento\Framework\Console\CommandListInterface">

@@ -7,11 +7,8 @@
 namespace Dopamedia\Batch\ArrayConverter\FlatToStandard;
 
 use Dopamedia\Batch\ArrayConverter\ArrayConverterInterface;
+use Magento\Store\Model\Store;
 use Magento\CatalogImportExport\Model\Import\Product as ProductImportModel;
-use Magento\Framework\App\Config\ScopeConfigInterface;
-use Magento\Directory\Helper\Data;
-use Magento\Store\Model\ScopeInterface;
-use Magento\Store\Model\StoreManagerInterface;
 
 /**
  * Class Product
@@ -19,146 +16,73 @@ use Magento\Store\Model\StoreManagerInterface;
  */
 class Product implements ArrayConverterInterface
 {
+    public const STORE_VIEW_SPECIFIC_MARKER = '--store_view-';
+
     /**
-     * @var array
+     * @var string[]
      */
-    private $requiredColumnNames = [
+    private static $defaultImportColNames = [
         ProductImportModel::COL_SKU,
-        ProductImportModel::COL_TYPE,
-        ProductImportModel::COL_ATTR_SET
+        ProductImportModel::COL_ATTR_SET,
+        ProductImportModel::COL_TYPE
     ];
-
-    /**
-     * @var StoreManagerInterface
-     */
-    private $storeManager;
-
-    /**
-     * @var ScopeConfigInterface
-     */
-    private $scopeConfig;
-
-    /**
-     * @var null|array
-     */
-    private $storeViewLocales;
-
-    /**
-     * Product constructor.
-     * @param StoreManagerInterface $storeManager
-     * @param ScopeConfigInterface $scopeConfig
-     */
-    public function __construct(
-        StoreManagerInterface $storeManager,
-        ScopeConfigInterface $scopeConfig
-    )
-    {
-        $this->storeManager = $storeManager;
-        $this->scopeConfig = $scopeConfig;
-    }
-
-    /**
-     * @return array
-     */
-    private function getStoreViewLocales(): array
-    {
-        if ($this->storeViewLocales === null) {
-            $storeViewLocales = [];
-            /** @var \Magento\Store\Api\Data\StoreInterface $store */
-            foreach ($this->storeManager->getStores() as $store) {
-                $storeViewLocales[$store->getCode()] = $this->scopeConfig->getValue(
-                    Data::XML_PATH_DEFAULT_LOCALE,
-                    ScopeInterface::SCOPE_STORE,
-                    $store->getCode()
-                );
-            }
-
-            $this->storeViewLocales = $storeViewLocales;
-        }
-
-        return $this->storeViewLocales;
-    }
-
-    /**
-     * @param string $columnName
-     * @return bool
-     */
-    private function isColumnLocalized(string $columnName): bool
-    {
-        return in_array($this->getLocaleFromColumnName($columnName), $this->getStoreViewLocales());
-    }
-
-    /**
-     * @param string $columnName
-     * @return string
-     */
-    private function getLocaleFromColumnName(string $columnName): string
-    {
-        return substr($columnName, -5);
-    }
-
-    /**
-     * @param string $columnName
-     * @return string
-     */
-    private function removeLocaleFromColumnName(string $columnName): string
-    {
-        return substr($columnName, 0, -6);
-    }
-
-    /**
-     * @param array $localizedColumns
-     * @param array $requiredColumns
-     * @return array
-     */
-    private function generateLocalizedItems(array $localizedColumns, array $requiredColumns): array
-    {
-        $itemsByLocale = [];
-        $itemsByStoreView = [];
-
-        if (!empty($localizedColumns)) {
-            foreach ($localizedColumns as $localizedColumnName => $value) {
-                $locale = $this->getLocaleFromColumnName($localizedColumnName);
-                $columnName = $this->removeLocaleFromColumnName($localizedColumnName);
-                $itemsByLocale[$locale][$columnName] = $value;
-            }
-
-            foreach ($this->getStoreViewLocales() as $storeViewCode => $locale) {
-                if (isset($itemsByLocale[$locale])) {
-                    $itemsByStoreView[] = array_merge(
-                        $itemsByLocale[$locale],
-                        $requiredColumns,
-                        [ProductImportModel::COL_STORE_VIEW_CODE => $storeViewCode]
-                    );
-                }
-            }
-        }
-
-        return $itemsByStoreView;
-    }
 
     /**
      * @inheritDoc
      */
-    public function convert(array $item): array
+    public function convert(array $items): array
     {
-        $localizedColumns = [];
-        $requiredColumns = [];
+        $convertedItem = [];
 
-        foreach ($item as $columnName => $value) {
-            if (in_array($columnName, $this->requiredColumnNames)) {
-                $requiredColumns[$columnName] = $value;
-            }
-
-            if ($this->isColumnLocalized($columnName)) {
-                $localizedColumns[$columnName] = $value;
-                unset($item[$columnName]);
+        foreach ($items as $colName => $value) {
+            if ($this->isColumnStoreViewSpecific($colName)) {
+                $convertedItem[$this->extractStoreViewCode($colName)][$this->extractColumnName($colName)] = $value;
+            } else {
+                $convertedItem[Store::ADMIN_CODE][$colName] = $value;
             }
         }
 
-        return array_merge(
-            [$item],
-            $this->generateLocalizedItems($localizedColumns, $requiredColumns)
+        foreach ($convertedItem as $storeViewCode => $storeViewColumn) {
+            if ($storeViewCode !== Store::ADMIN_CODE) {
+                foreach (self::$defaultImportColNames as $defaultImportColName) {
+                    if (array_key_exists($defaultImportColName, $convertedItem[Store::ADMIN_CODE])) {
+                        $convertedItem[$storeViewCode][$defaultImportColName] = $convertedItem[Store::ADMIN_CODE][$defaultImportColName];
+                    }
+                }
+
+                $convertedItem[$storeViewCode][ProductImportModel::COL_STORE_VIEW_CODE] = $storeViewCode;
+            }
+        }
+
+        return array_values($convertedItem);
+    }
+
+    /**
+     * @param string $colName
+     * @return bool
+     */
+    private function isColumnStoreViewSpecific(string $colName): bool
+    {
+        return strpos($colName, self::STORE_VIEW_SPECIFIC_MARKER);
+    }
+
+    /**
+     * @param string $colName
+     * @return string
+     */
+    private function extractStoreViewCode(string $colName): string
+    {
+        return substr(
+            $colName,
+            strpos(
+                $colName,
+                self::STORE_VIEW_SPECIFIC_MARKER) + strlen(self::STORE_VIEW_SPECIFIC_MARKER
+            )
         );
+    }
+
+    private function extractColumnName(string $colName): string
+    {
+        return substr($colName, 0, strpos($colName, self::STORE_VIEW_SPECIFIC_MARKER));
     }
 }

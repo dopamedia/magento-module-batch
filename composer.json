@@ -13,10 +13,10 @@
         "php": "~7.1.0",
         "dopamedia/php-batch": "dev-master",
         "magento/framework": "101.0.0",
+        "magento/module-import-export": "100.2.0",
         "symfony/filesystem": "^3.3",
         "box/spout": "^2.7",
-        "firegento/fastsimpleimport": "dev-master#76f13957df9d6e7489a8066d4c76edc5ce12a038",
-        "magento/module-import-export": "100.2.0"
+        "magento/module-catalog-import-export": "100.2.0"
     },
     "require-dev": {
         "phpunit/phpunit": "~6.2.0"

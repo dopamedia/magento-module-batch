@@ -10,11 +10,6 @@ use Dopamedia\Batch\Reader\Database\AbstractReader;
 use Dopamedia\PhpBatch\StepExecutionInterface;
 use PHPUnit\Framework\TestCase;
 
-/**
- * Class AbstractReaderTest
- * @package Dopamedia\Batch\Test\Unit\Reader\Database
- * @group current
- */
 class AbstractReaderTest extends TestCase
 {
     /**
