@@ -14,9 +14,10 @@
         "dopamedia/php-batch": "dev-master",
         "magento/framework": "101.0.0",
         "magento/module-import-export": "100.2.0",
+        "magento/module-catalog-import-export": "100.2.0",
+        "symfony/finder": "^3.3",
         "symfony/filesystem": "^3.3",
-        "box/spout": "^2.7",
-        "magento/module-catalog-import-export": "100.2.0"
+        "box/spout": "^2.7"
     },
     "require-dev": {
         "phpunit/phpunit": "~6.2.0"

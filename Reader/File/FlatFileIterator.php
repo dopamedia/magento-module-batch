@@ -60,9 +60,6 @@ class FlatFileIterator implements FileIteratorInterface
      * @param HeaderProviderInterface $headerProvider
      * @param array $options
      * @param FilesystemFactory $filesystemFactory
-     * @throws \Box\Spout\Common\Exception\IOException
-     * @throws \Box\Spout\Common\Exception\UnsupportedTypeException
-     * @throws \Box\Spout\Reader\Exception\ReaderNotOpenedException
      */
     public function __construct(
         string $type,
