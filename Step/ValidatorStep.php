@@ -6,7 +6,7 @@
 
 namespace Dopamedia\Batch\Step;
 
-use Dopamedia\Batch\Item\CharsetValidator;
+use Dopamedia\Batch\Item\CharsetValidatorInterface;
 use Dopamedia\PhpBatch\Adapter\EventManagerAdapterInterface;
 use Dopamedia\PhpBatch\Repository\JobRepositoryInterface;
 use Dopamedia\PhpBatch\Step\AbstractStep;
@@ -19,7 +19,7 @@ use Dopamedia\PhpBatch\StepExecutionInterface;
 class ValidatorStep extends AbstractStep
 {
     /**
-     * @var CharsetValidator
+     * @var CharsetValidatorInterface
      */
     private $charsetValidator;
 
@@ -30,7 +30,7 @@ class ValidatorStep extends AbstractStep
         string $name,
         EventManagerAdapterInterface $eventManagerAdapter,
         JobRepositoryInterface $jobRepository,
-        CharsetValidator $charsetValidator
+        CharsetValidatorInterface $charsetValidator
     )
     {
         parent::__construct($name, $eventManagerAdapter, $jobRepository);
@@ -48,5 +48,4 @@ class ValidatorStep extends AbstractStep
         $this->charsetValidator->setStepExecution($stepExecution);
         $this->charsetValidator->validate();
     }
-
 }

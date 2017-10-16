@@ -15,6 +15,7 @@
     <preference for="Dopamedia\PhpBatch\Item\ItemWriterInterface" type="Dopamedia\Batch\Writer\NoopWriter" />
     <preference for="Dopamedia\Batch\Reader\File\FileIteratorInterface" type="Dopamedia\Batch\Reader\File\FlatFileIterator" />
     <preference for="Dopamedia\Batch\Reader\File\HeaderProviderInterface" type="Dopamedia\Batch\Reader\File\FirstRowHeaderProvider" />
+    <preference for="Dopamedia\Batch\Item\CharsetValidatorInterface" type="Dopamedia\Batch\Item\CharsetValidator" />
 
     <type name="Dopamedia\PhpBatch\Job\JobParameters\DefaultValuesProviderRegistryInterface">
         <arguments>

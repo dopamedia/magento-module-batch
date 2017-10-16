@@ -6,7 +6,6 @@
 
 namespace Dopamedia\Batch\Item;
 
-use Dopamedia\PhpBatch\Step\StepExecutionAwareInterface;
 use Dopamedia\PhpBatch\Step\StepExecutionAwareTrait;
 use Magento\Framework\Exception\FileSystemException;
 use Magento\Framework\Exception\LocalizedException;
@@ -17,7 +16,7 @@ use Symfony\Component\Filesystem\Filesystem;
  * Class CharsetValidator
  * @package Dopamedia\Batch\Item
  */
-class CharsetValidator implements StepExecutionAwareInterface
+class CharsetValidator implements CharsetValidatorInterface
 {
     use StepExecutionAwareTrait;
 
@@ -54,9 +53,7 @@ class CharsetValidator implements StepExecutionAwareInterface
     }
 
     /**
-     * @throws FileSystemException
-     * @throws LocalizedException
-     * @return void
+     * @inheritdoc
      */
     public function validate(): void
     {

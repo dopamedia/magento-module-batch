@@ -106,9 +106,7 @@ class MultiFileReader implements ItemReaderInterface, StepExecutionAwareInterfac
      */
     private function initializeCurrentFileReader(SplFileInfo $fileInfo): ItemReaderInterface
     {
-        if ($this->currentFileReader === null) {
-            $this->currentFileReader = clone $this->fileReader;
-        }
+        $this->currentFileReader = clone $this->fileReader;
 
         if ($this->currentFileReader instanceof StepExecutionAwareInterface) {
             $this->currentFileReader->setStepExecution($this->getStepExecution());
